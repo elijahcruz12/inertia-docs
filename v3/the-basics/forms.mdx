@@ -335,41 +335,7 @@ The `<Form>` component exposes reactive state and helper methods through its def
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form
-    action="/users"
-    method="post"
-    let:errors
-    let:hasErrors
-    let:processing
-    let:progress
-    let:wasSuccessful
-    let:recentlySuccessful
-    let:setError
-    let:clearErrors
-    let:resetAndClearErrors
-    let:defaults
-    let:isDirty
-    let:reset
-    let:submit
->
-    <input type="text" name="name" />
-
-    {#if errors.name}
-        <div>{errors.name}</div>
-    {/if}
-
-    <button type="submit" disabled={processing}>
-        {processing ? 'Creating...' : 'Create User'}
-    </button>
-
-    {#if wasSuccessful}
-        <div>User created successfully!</div>
-    {/if}
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form action="/users" method="post">
     {#snippet children({
         errors,
@@ -427,16 +393,7 @@ The `errors` object uses dotted notation for nested fields, allowing you to disp
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form action="/users" method="post" let:errors>
-    <input type="text" name="user.name" />
-    {#if errors['user.name']}
-        <div>{errors['user.name']}</div>
-    {/if}
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form action="/users" method="post">
     {#snippet children({ errors })}
         <input type="text" name="user.name" />
@@ -465,6 +422,7 @@ In addition to `action` and `method`, the `<Form>` component accepts several pro
     :headers="{ 'X-Custom-Header': 'value' }"
     :show-progress="false"
     :transform="(data) => ({ ...data, timestamp: Date.now() })"
+    :optimistic="(props, data) => ({ ...props })"
     :invalidate-cache-tags="['users', 'dashboard']"
     disable-while-processing
     :options="{
@@ -492,6 +450,7 @@ In addition to `action` and `method`, the `<Form>` component accepts several pro
   headers={{ "X-Custom-Header": "value" }}
   showProgress={false}
   transform={(data) => ({ ...data, timestamp: Date.now() })}
+  optimistic={(props, data) => ({ ...props })}
   invalidateCacheTags={["users", "dashboard"]}
   disableWhileProcessing
   options={{
@@ -518,6 +477,7 @@ In addition to `action` and `method`, the `<Form>` component accepts several pro
     headers={{ 'X-Custom-Header': 'value' }}
     showProgress={false}
     transform={data => ({ ...data, timestamp: Date.now() })}
+    optimistic={(props, data) => ({ ...props })}
     invalidateCacheTags={['users', 'dashboard']}
     disableWhileProcessing
     options={{
@@ -615,25 +575,7 @@ The `<Form>` component emits all the standard visit [events](/v3/advanced/events
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form
-    action="/users"
-    method="post"
-    on:cancelToken={handleCancelToken}
-    on:before={handleBefore}
-    on:start={handleStart}
-    on:progress={handleProgress}
-    on:cancel={handleCancel}
-    on:success={handleSuccess}
-    on:error={handleError}
-    on:finish={handleFinish}
->
-    <input type="text" name="name" />
-    <button type="submit">Create User</button>
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form
     action="/users"
     method="post"
@@ -972,9 +914,7 @@ In React and Vue, refs provide access to all form methods and reactive state. In
 
 ### Form Context
 
-<Badge>v2.3.9+</Badge>
-
-Sometimes you may wish to access form state or methods from deeply nested child components without passing props through multiple levels. The `useFormContext` hook provides access to the parent `<Form>` component's state and methods from any child component.
+Deeply nested child components may need access to form state or methods without passing props through multiple levels. The `useFormContext` hook provides access to the parent `<Form>` component's state and methods from any child component.
 
 <CodeGroup>
 
@@ -1039,9 +979,11 @@ const form = useFormContext()
 
 The context provides access to all the same properties and methods available through [slot props](#slot-props).
 
-### Precognition
+<Note>
+Both the `<Form>` component and `useFormContext` accept generic type parameters for type-safe errors and slot props. See the [TypeScript](/v3/advanced/typescript#form-component) documentation for details.
+</Note>
 
-<Badge>v2.3+</Badge>
+### Precognition
 
 The `<Form>` component includes built-in support for [Laravel Precognition](https://laravel.com/docs/precognition), enabling real-time form validation without duplicating your server-side validation rules on the client.
 
@@ -1099,36 +1041,7 @@ Once your server is configured, call `validate()` with a field name to trigger v
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form
-    action="/users"
-    method="post"
-    let:errors
-    let:invalid
-    let:validate
-    let:validating
->
-    <label for="name">Name:</label>
-    <input id="name" name="name" on:change={() => validate('name')} />
-    {#if invalid('name')}
-        <p>{errors.name}</p>
-    {/if}
-
-    <label for="email">Email:</label>
-    <input id="email" name="email" on:change={() => validate('email')} />
-    {#if invalid('email')}
-        <p>{errors.email}</p>
-    {/if}
-
-    {#if validating}
-        <p>Validating...</p>
-    {/if}
-
-    <button type="submit">Create User</button>
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form action="/users" method="post">
     {#snippet children({ errors, invalid, validate, validating })}
         <label for="name">Name:</label>
@@ -1182,19 +1095,7 @@ You may also use the `valid()` helper to check if a field has passed validation.
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form action="/users" method="post" let:errors let:invalid let:valid let:validate>
-    <input name="email" on:change={() => validate('email')} />
-    {#if valid('email')}
-        <p>Valid email address</p>
-    {/if}
-    {#if invalid('email')}
-        <p>{errors.email}</p>
-    {/if}
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form action="/users" method="post">
     {#snippet children({ errors, invalid, valid, validate })}
         <input name="email" onchange={() => validate('email')} />
@@ -1265,26 +1166,7 @@ You may validate multiple fields at once using the `only` option. This is partic
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form action="/users" method="post" let:validate>
-    <!-- Step 1 fields -->
-    <input name="name" />
-    <input name="email" />
-
-    <button
-        type="button"
-        on:click={() => validate({
-            only: ['name', 'email'],
-            onSuccess: () => goToNextStep(),
-            onValidationError: () => showErrors(),
-        })}
-    >
-        Next Step
-    </button>
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form action="/users" method="post">
     {#snippet children({ validate })}
         <!-- Step 1 fields -->
@@ -1343,21 +1225,7 @@ The `touch()` method marks fields as "touched" without triggering validation. Yo
 </Form>
 ```
 
-```svelte Svelte 4 icon="s"
-<Form action="/users" method="post" let:validate let:touch let:touched>
-    <input name="name" on:blur={() => touch('name')} />
-    <input name="email" on:blur={() => touch('email')} />
-    <input name="phone" on:blur={() => touch('phone')} />
-
-    <button type="button" on:click={() => validate()}>Validate Touched Fields</button>
-
-    {#if touched('name')}
-        <p>Name has been touched</p>
-    {/if}
-</Form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <Form action="/users" method="post">
     {#snippet children({ validate, touch, touched })}
         <input name="name" onblur={() => touch('name')} />
@@ -1549,36 +1417,7 @@ return (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-import { useForm } from '@inertiajs/svelte'
-
-const form = useForm({
-    email: null,
-    password: null,
-    remember: false,
-})
-
-function submit() {
-    $form.post('/login')
-}
-</script>
-
-<form on:submit|preventDefault={submit}>
-    <input type="text" bind:value={$form.email} />
-    {#if $form.errors.email}
-        <div class="form-error">{$form.errors.email}</div>
-    {/if}
-    <input type="password" bind:value={$form.password} />
-    {#if $form.errors.password}
-        <div class="form-error">{$form.errors.password}</div>
-    {/if}
-    <input type="checkbox" bind:checked={$form.remember} /> Remember Me
-    <button type="submit" disabled={$form.processing}>Submit</button>
-</form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
 import { useForm } from '@inertiajs/svelte'
 
@@ -2057,7 +1896,7 @@ const form = useForm(`EditUser:${user.id}\
 
 #### Excluding Fields
 
-Sometimes you may wish to prevent certain fields from being stored in history state. For example, you may want to exclude password fields for security reasons.
+Sensitive fields like passwords may be excluded from history state using the `dontRemember()` method.
 
 <CodeGroup>
 
@@ -2104,8 +1943,6 @@ form.dontRemember("password", "password_confirmation");
 
 ### Wayfinder
 
-<Badge>v2.0.6+</Badge>
-
 When using [Wayfinder](https://github.com/laravel/wayfinder) in conjunction with the form helper, you can simply pass the resulting object directly to the `form.submit` method. The form helper will infer the HTTP method and URL from the Wayfinder object.
 
 <CodeGroup>
@@ -2149,8 +1986,6 @@ form.submit(store());
 </CodeGroup>
 
 ### Precognition
-
-<Badge>v2.3+</Badge>
 
 Just like the `<Form>` component, the `useForm` helper supports [Precognition](#precognition) for real-time validation. You may enable it by chaining the `withPrecognition()` method with the HTTP method and endpoint for validation requests.
 
@@ -2293,36 +2128,7 @@ return (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-import { useForm } from '@inertiajs/svelte'
-
-const form = useForm('post', '/users', {
-    name: '',
-    email: '',
-})
-</script>
-
-<form on:submit|preventDefault={() => $form.post('/users')}>
-    <input bind:value={$form.name} on:change={() => $form.validate('name')} />
-    {#if $form.invalid('name')}
-        <p>{$form.errors.name}</p>
-    {/if}
-
-    <input bind:value={$form.email} on:change={() => $form.validate('email')} />
-    {#if $form.invalid('email')}
-        <p>{$form.errors.email}</p>
-    {/if}
-
-    {#if $form.validating}
-        <p>Validating...</p>
-    {/if}
-
-    <button type="submit">Create User</button>
-</form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
 import { useForm } from '@inertiajs/svelte'
 
@@ -2595,36 +2401,7 @@ export default function Edit() {
 }
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-import { router } from '@inertiajs/svelte'
-
-let values = {
-    first_name: null,
-    last_name: null,
-    email: null,
-}
-
-function submit() {
-    router.post('/users', values)
-}
-</script>
-
-<form on:submit|preventDefault={submit}>
-    <label for="first_name">First name:</label>
-    <input id="first_name" bind:value={values.first_name}>
-
-    <label for="last_name">Last name:</label>
-    <input id="last_name" bind:value={values.last_name}>
-
-    <label for="email">Email:</label>
-    <input id="email" bind:value={values.email}>
-
-    <button type="submit">Submit</button>
-</form>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
 import { router } from '@inertiajs/svelte'
 
@@ -2662,6 +2439,10 @@ When making requests or form submissions that include files, Inertia will automa
 
 For more information on file uploads, including progress tracking, see the [file uploads documentation](/v3/the-basics/file-uploads).
 
-## XHR / Fetch Submissions
+## Optimistic Updates
 
-Using Inertia to submit forms works great for the vast majority of situations. However, in the event that you need more control over the form submission, you're free to make plain XHR or `fetch` requests instead, using the library of your choice.
+Both the `<Form>` component and `useForm` helper support optimistic updates, allowing you to update the UI immediately before the server responds. For more details, see the [optimistic updates](/v3/the-basics/optimistic-updates) documentation.
+
+## Non-Inertia Submissions
+
+Using Inertia to submit forms works great for the vast majority of situations. For standalone HTTP requests that don't trigger page visits, you may use the [`useHttp`](/v3/the-basics/http-requests) hook, which provides the same developer experience as `useForm`. You're also free to make plain XHR or `fetch` requests using the library of your choice.

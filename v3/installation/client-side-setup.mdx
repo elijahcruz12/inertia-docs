@@ -21,93 +21,119 @@ These starter kits are the absolute fastest way to start building a new Inertia 
 
 <Steps>
     <Step title="Install dependencies">
-        First, install the Inertia client-side adapter corresponding to your framework of choice.
+        Install the Inertia client-side adapter and Vite plugin.
 
         <CodeGroup>
         ```bash Vue icon="vuejs"
-        npm install @inertiajs/vue3
+        npm install @inertiajs/vue3 @inertiajs/vite
         ```
 
         ```bash React icon="react"
-        npm install @inertiajs/react
+        npm install @inertiajs/react @inertiajs/vite
         ```
 
         ```bash Svelte icon="s"
-        npm install @inertiajs/svelte
+        npm install @inertiajs/svelte @inertiajs/vite
         ```
         </CodeGroup>
     </Step>
 
+    <Step title="Configure Vite">
+        Add the Inertia plugin to your `vite.config.js` file.
+
+        ```js vite.config.js
+        import inertia from '@inertiajs/vite'
+        import laravel from 'laravel-vite-plugin'
+        import { defineConfig } from 'vite'
+
+        export default defineConfig({
+            plugins: [
+                laravel({
+                    input: ['resources/css/app.css', 'resources/js/app.js'],
+                    refresh: true,
+                }),
+                inertia(),
+            ],
+        })
+        ```
+    </Step>
+
     <Step title="Initialize the Inertia app">
-        Next, update your main JavaScript file to boot your Inertia app. To accomplish this, we'll initialize the client-side framework with the base Inertia component.
+        Update your main JavaScript file to boot your Inertia app. The Vite plugin handles page resolution and mounting automatically, so a minimal entry point is all you need.
 
         <CodeGroup>
         ```js Vue icon="vuejs"
-        import { createApp, h } from 'vue'
         import { createInertiaApp } from '@inertiajs/vue3'
 
-        createInertiaApp({
-            resolve: name => {
-                const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-                return pages[`./Pages/${name}.vue`]
-            },
-            setup({ el, App, props, plugin }) {
-                createApp({ render: () => h(App, props) })
-                    .use(plugin)
-                    .mount(el)
-            },
-        })
+        createInertiaApp()
         ```
 
         ```jsx React icon="react"
         import { createInertiaApp } from '@inertiajs/react'
-        import { createRoot } from 'react-dom/client'
 
-        createInertiaApp({
-            resolve: name => {
-                const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
-                return pages[`./Pages/${name}.jsx`]
-            },
-            setup({ el, App, props }) {
-                createRoot(el).render(<App {...props} />)
-            },
-        })
+        createInertiaApp()
         ```
 
-        ```js Svelte 4 icon="s"
+        ```js Svelte icon="s"
         import { createInertiaApp } from '@inertiajs/svelte'
 
-        createInertiaApp({
-            resolve: name => {
-                const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
-                return pages[`./Pages/${name}.svelte`]
-            },
-            setup({ el, App, props }) {
-                new App({ target: el, props })
-            },
-        })
-        ```
-
-        ```js Svelte 5 icon="s"
-        import { createInertiaApp } from '@inertiajs/svelte'
-        import { mount } from 'svelte'
-
-        createInertiaApp({
-            resolve: name => {
-                const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
-                return pages[`./Pages/${name}.svelte`]
-            },
-            setup({ el, App, props }) {
-                mount(App, { target: el, props })
-            },
-        })
+        createInertiaApp()
         ```
         </CodeGroup>
 
-        The `setup` callback receives everything necessary to initialize the client-side framework, including the root Inertia `App` component.
+        The plugin generates a default resolver that looks for pages in both `./pages` and `./Pages` directories, and the app mounts automatically.
     </Step>
 
 </Steps>
+
+## Pages Shorthand
+
+You may use the `pages` shorthand to customize which directory to search for page components.
+
+<CodeGroup>
+
+```js Vue icon="vuejs"
+createInertiaApp({
+    pages: './AppPages',
+    // ...
+})
+```
+
+```jsx React icon="react"
+createInertiaApp({
+    pages: './AppPages',
+    // ...
+})
+```
+
+```js Svelte icon="s"
+createInertiaApp({
+    pages: './AppPages',
+    // ...
+})
+```
+
+</CodeGroup>
+
+An object may also be provided for more control over how pages are resolved.
+
+```js
+createInertiaApp({
+    pages: {
+        path: './Pages',
+        extension: '.tsx',
+        eager: false,
+        transform: (name, page) => name.replace('/', '-'),
+    },
+})
+```
+
+| Option | Description |
+|---|---|
+| `path` | The directory to search for page components. |
+| `extension` | A string or array of file extensions (e.g., `'.tsx'` or `['.tsx', '.jsx']`). Defaults to your framework's extension. |
+| `eager` | Whether to use eager loading. Defaults to `true`. |
+| `transform` | A callback that receives the page name and page object, returning a transformed name. |
 
 ## Configuring Defaults
 
@@ -194,49 +220,6 @@ const duration = config.get("form.recentlySuccessfulDuration");
 
 </CodeGroup>
 
-## Resolving Components
-
-The `resolve` callback tells Inertia how to load a page component. It receives a page name (string), and returns a page component module. How you implement this callback depends on which bundler (Vite or Webpack) you're using.
-
-<CodeGroup>
-
-```js Vue icon="vuejs"
-// Vite
-resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-    return pages[`./Pages/${name}.vue`]
-},
-
-// Webpack
-resolve: name => require(`./Pages/${name}`),
-```
-
-```js React icon="react"
-// Vite
-resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
-    return pages[`./Pages/${name}.jsx`]
-},
-
-// Webpack
-resolve: name => require(`./Pages/${name}`),
-```
-
-```js Svelte icon="s"
-// Vite
-resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
-    return pages[`./Pages/${name}.svelte`]
-},
-
-// Webpack
-resolve: name => require(`./Pages/${name}.svelte`),
-```
-
-</CodeGroup>
-
-By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see our [code splitting](/v3/advanced/code-splitting) documentation.
-
 ## Defining a Root Element
 
 By default, Inertia assumes that your application's root template has a root element with an `id` of `app`. If your application's root element has a different `id`, you can provide it using the `id` property.
@@ -250,19 +233,111 @@ createInertiaApp({
 
 If you change the `id` of the root element, be sure to update it [server-side](/v3/installation/server-side-setup#root-template) as well.
 
-## Script Element for Page Data
+## Initial Page Data
 
-By default, Inertia stores the initial page data in a `data-page` attribute on the root element. You may configure Inertia to use a `<script type="application/json">` element instead, which is slightly faster and easier to inspect in your browser's dev tools.
+By default, Inertia passes the initial page data via a `<script type="application/json">` element. You may revert to the legacy behavior of storing page data in a `data-page` attribute on the root element by setting the `legacy.useDataAttributeForInitialPage` option to `true`.
 
 ```js
 createInertiaApp({
   // ...
   defaults: {
-    future: {
-      useScriptElementForInitialPage: true,
+    legacy: {
+      useDataAttributeForInitialPage: true,
     },
   },
 });
 ```
 
-Be sure to also update your [SSR entry point](/v3/advanced/server-side-rendering#add-server-entry-point) if you're using server-side rendering. Laravel users should also set the `inertia.use_script_element_for_initial_page` config value to `true` so the `@inertia` Blade directive outputs a script element.
+Laravel users should also set the `inertia.pages.use_data_attribute_for_initial_page` config value to `true` so the `@inertia` Blade directive outputs a data attribute instead of a script element.
+
+## HTTP Client
+
+Inertia uses a built-in XHR client for all requests. No additional HTTP libraries like Axios are required.
+
+### Using Axios
+
+If your application relies on Axios interceptors or a custom Axios instance, you may provide the `axiosAdapter` as the `http` option when creating your Inertia app.
+
+```js
+import { axiosAdapter } from '@inertiajs/core'
+
+createInertiaApp({
+    // ...
+    http: axiosAdapter(),
+})
+```
+
+A custom Axios instance may also be provided to the adapter.
+
+```js
+import axios from 'axios'
+import { axiosAdapter } from '@inertiajs/core'
+
+const instance = axios.create({
+    baseURL: '/api',
+})
+
+instance.interceptors.request.use(/* ... */)
+
+createInertiaApp({
+    // ...
+    http: axiosAdapter(instance),
+})
+```
+
+## Manual Setup
+
+If you prefer not to use the Vite plugin, you may provide the `resolve` and `setup` callbacks manually. The `resolve` callback tells Inertia how to load a page component, and the `setup` callback initializes the client-side framework.
+
+<CodeGroup>
+
+```js Vue icon="vuejs"
+import { createApp, h } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
+
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+        return pages[`./Pages/${name}.vue`]
+    },
+    setup({ el, App, props, plugin }) {
+        createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .mount(el)
+    },
+})
+```
+
+```jsx React icon="react"
+import { createInertiaApp } from '@inertiajs/react'
+import { createRoot } from 'react-dom/client'
+
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+        return pages[`./Pages/${name}.jsx`]
+    },
+    setup({ el, App, props }) {
+        createRoot(el).render(<App {...props} />)
+    },
+})
+```
+
+```js Svelte icon="s"
+import { createInertiaApp } from '@inertiajs/svelte'
+import { mount } from 'svelte'
+
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
+        return pages[`./Pages/${name}.svelte`]
+    },
+    setup({ el, App, props }) {
+        mount(App, { target: el, props })
+    },
+})
+```
+
+</CodeGroup>
+
+By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see our [code splitting](/v3/advanced/code-splitting) documentation.

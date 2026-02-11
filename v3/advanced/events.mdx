@@ -112,9 +112,16 @@ Combined with hooks, you can automatically remove the event listener when compon
 <CodeGroup>
 
 ```vue Vue icon="vuejs"
-import { router } from '@inertiajs/vue3' import { onUnmounted } from 'vue'
-onUnmounted( router.on('start', (event) => { console.log(`Starting a visit to
-${event.detail.visit.url}`) }) )
+<script setup>
+import { router } from '@inertiajs/vue3'
+import { onUnmounted } from 'vue'
+
+onUnmounted(
+  router.on('start', (event) => {
+    console.log(`Starting a visit to ${event.detail.visit.url}`)
+  })
+)
+</script>
 ```
 
 ```jsx React icon="react"
@@ -128,18 +135,7 @@ useEffect(() => {
 }, []);
 ```
 
-```js Svelte 4 icon="s"
-import { router } from "@inertiajs/svelte";
-import { onMount } from "svelte";
-
-onMount(() => {
-  return router.on("start", (event) => {
-    console.log(`Starting a visit to ${event.detail.visit.url}`);
-  });
-});
-```
-
-```js Svelte 5 icon="s"
+```js Svelte icon="s"
 import { router } from "@inertiajs/svelte";
 
 $effect(() => {
@@ -198,7 +194,7 @@ document.removeEventListener("inertia:start", startEventListener);
 
 ## Cancelling Events
 
-Some events, such as `before`, `exception`, and `invalid`, support cancellation, allowing you to prevent Inertia's default behavior. Just like native events, the event will be cancelled if only one event listener calls `event.preventDefault()`.
+Some events, such as `before`, `networkError`, and `httpException`, support cancellation, allowing you to prevent Inertia's default behavior. Just like native events, the event will be cancelled if only one event listener calls `event.preventDefault()`.
 
 <CodeGroup>
 
@@ -432,8 +428,6 @@ The `success` event is not cancelable.
 
 ## Flash
 
-<Badge>v2.3.3+</Badge>
-
 The `flash` event fires when [flash data](/v3/data-props/flash-data) is received from the server. This is useful for displaying toast notifications or handling temporary data in a central location.
 
 <CodeGroup>
@@ -506,18 +500,18 @@ router.on("error", (errors) => {
 
 The `error` event is not cancelable.
 
-## Invalid
+## HTTP Exception
 
-The `invalid` event fires when a non-Inertia response is received from the server, such as an HTML or vanilla JSON response. A valid Inertia response is a response that has the `X-Inertia` header set to `true` with a `json` payload containing [the page object](/v3/core-concepts/the-protocol#the-page-object).
+The `httpException` event fires when a non-Inertia response is received from the server, such as an HTML or vanilla JSON response. A valid Inertia response is a response that has the `X-Inertia` header set to `true` with a `json` payload containing [the page object](/v3/core-concepts/the-protocol#the-page-object).
 
-This event is fired for all response types, including `200`, `400`, and `500`response codes.
+This event is fired for all response types, including `200`, `400`, and `500` response codes.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
 import { router } from "@inertiajs/vue3";
 
-router.on("invalid", (event) => {
+router.on("httpException", (event) => {
   console.log(`An invalid Inertia response was received.`);
   console.log(event.detail.response);
 });
@@ -526,7 +520,7 @@ router.on("invalid", (event) => {
 ```jsx React icon="react"
 import { router } from "@inertiajs/react";
 
-router.on("invalid", (event) => {
+router.on("httpException", (event) => {
   console.log(`An invalid Inertia response was received.`);
   console.log(event.detail.response);
 });
@@ -535,7 +529,7 @@ router.on("invalid", (event) => {
 ```js Svelte icon="s"
 import { router } from "@inertiajs/svelte";
 
-router.on("invalid", (event) => {
+router.on("httpException", (event) => {
   console.log(`An invalid Inertia response was received.`);
   console.log(event.detail.response);
 });
@@ -543,14 +537,14 @@ router.on("invalid", (event) => {
 
 </CodeGroup>
 
-You may cancel the `invalid` event to prevent Inertia from showing the non-Inertia response modal.
+You may cancel the `httpException` event to prevent Inertia from showing the non-Inertia response modal.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
 import { router } from "@inertiajs/vue3";
 
-router.on("invalid", (event) => {
+router.on("httpException", (event) => {
   event.preventDefault();
 
   // Handle the invalid response yourself...
@@ -560,7 +554,7 @@ router.on("invalid", (event) => {
 ```jsx React icon="react"
 import { router } from "@inertiajs/react";
 
-router.on("invalid", (event) => {
+router.on("httpException", (event) => {
   event.preventDefault();
 
   // Handle the invalid response yourself...
@@ -570,7 +564,7 @@ router.on("invalid", (event) => {
 ```js Svelte icon="s"
 import { router } from "@inertiajs/svelte";
 
-router.on("invalid", (event) => {
+router.on("httpException", (event) => {
   event.preventDefault();
 
   // Handle the invalid response yourself...
@@ -579,49 +573,49 @@ router.on("invalid", (event) => {
 
 </CodeGroup>
 
-## Exception
+## Network Error
 
-The `exception` event fires on unexpected XHR errors such as network interruptions. In addition, this event fires for errors generated when resolving page components.
+The `networkError` event fires on unexpected XHR errors such as network interruptions. In addition, this event fires for errors generated when resolving page components.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
 import { router } from "@inertiajs/vue3";
 
-router.on("exception", (event) => {
+router.on("networkError", (event) => {
   console.log(`An unexpected error occurred during an Inertia visit.`);
-  console.log(event.detail.error);
+  console.log(event.detail.exception);
 });
 ```
 
 ```jsx React icon="react"
 import { router } from "@inertiajs/react";
 
-router.on("exception", (event) => {
+router.on("networkError", (event) => {
   console.log(`An unexpected error occurred during an Inertia visit.`);
-  console.log(event.detail.error);
+  console.log(event.detail.exception);
 });
 ```
 
 ```js Svelte icon="s"
 import { router } from "@inertiajs/svelte";
 
-router.on("exception", (event) => {
+router.on("networkError", (event) => {
   console.log(`An unexpected error occurred during an Inertia visit.`);
-  console.log(event.detail.error);
+  console.log(event.detail.exception);
 });
 ```
 
 </CodeGroup>
 
-You may cancel the `exception` event to prevent the error from being thrown.
+You may cancel the `networkError` event to prevent the error from being thrown.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
 import { router } from "@inertiajs/vue3";
 
-router.on("exception", (event) => {
+router.on("networkError", (event) => {
   event.preventDefault();
   // Handle the error yourself
 });
@@ -630,7 +624,7 @@ router.on("exception", (event) => {
 ```jsx React icon="react"
 import { router } from "@inertiajs/react";
 
-router.on("exception", (event) => {
+router.on("networkError", (event) => {
   event.preventDefault();
   // Handle the error yourself
 });
@@ -639,7 +633,7 @@ router.on("exception", (event) => {
 ```js Svelte icon="s"
 import { router } from "@inertiajs/svelte";
 
-router.on("exception", (event) => {
+router.on("networkError", (event) => {
   event.preventDefault();
   // Handle the error yourself
 });

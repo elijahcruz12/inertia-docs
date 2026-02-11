@@ -71,25 +71,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { Deferred } from '@inertiajs/svelte'
-
-    export let permissions
-</script>
-
-<Deferred data="permissions">
-    <svelte:fragment slot="fallback">
-        <div>Loading...</div>
-    </svelte:fragment>
-
-    {#each permissions as permission}
-        <!-- ... -->
-    {/each}
-</Deferred>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { Deferred } from '@inertiajs/svelte'
 
@@ -141,24 +123,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { Deferred } from '@inertiajs/svelte'
-
-    export let teams
-    export let users
-</script>
-
-<Deferred data={['teams', 'users']}>
-    <svelte:fragment slot="fallback">
-        <div>Loading...</div>
-    </svelte:fragment>
-
-    <!-- Props are now loaded -->
-</Deferred>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { Deferred } from '@inertiajs/svelte'
 
@@ -175,6 +140,72 @@ export default () => (
 ```
 
 </CodeGroup>
+
+## Reloading Indicator
+
+When deferred props are being reloaded via a partial reload, the `Deferred` component exposes a `reloading` boolean through its slot. This allows you to show a loading indicator while still displaying the previously loaded data.
+
+<CodeGroup>
+
+```vue Vue icon="vuejs"
+<script setup>
+import { Deferred } from "@inertiajs/vue3";
+</script>
+
+<template>
+  <Deferred data="permissions" #default="{ reloading }">
+    <template #fallback>
+      <div>Loading...</div>
+    </template>
+
+    <div :class="{ 'opacity-50': reloading }">
+      <div v-for="permission in permissions">
+        <!-- ... -->
+      </div>
+    </div>
+  </Deferred>
+</template>
+```
+
+```jsx React icon="react"
+import { Deferred } from "@inertiajs/react";
+
+export default () => (
+  <Deferred data="permissions" fallback={<div>Loading...</div>}>
+    {({ reloading }) => (
+      <div className={reloading ? "opacity-50" : ""}>
+        <PermissionsChildComponent />
+      </div>
+    )}
+  </Deferred>
+);
+```
+
+```svelte Svelte icon="s"
+<script>
+    import { Deferred } from '@inertiajs/svelte'
+
+    let { permissions } = $props()
+</script>
+
+<Deferred data="permissions">
+    {#snippet fallback()}
+        <div>Loading...</div>
+    {/snippet}
+
+    {#snippet children({ reloading })}
+        <div class:opacity-50={reloading}>
+            {#each permissions as permission}
+                <!-- ... -->
+            {/each}
+        </div>
+    {/snippet}
+</Deferred>
+```
+
+</CodeGroup>
+
+The `reloading` prop is `false` on the initial load and becomes `true` whenever a partial reload is in progress for the deferred keys. It returns to `false` once the reload completes.
 
 ## Combining with Once Props
 

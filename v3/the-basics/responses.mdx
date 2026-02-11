@@ -37,6 +37,20 @@ class EventsController extends Controller
 }
 ```
 
+The component name may also be a Backed Enum, which is useful for organizing page components with type-safe references.
+
+```php
+enum Page: string
+{
+    case EventShow = 'Event/Show';
+    case EventIndex = 'Event/Index';
+}
+
+return Inertia::render(Page::EventShow, [
+    'event' => $event,
+]);
+```
+
 <Tip>
   To ensure that pages load quickly, only return the minimum data required for
   the page.
@@ -85,7 +99,7 @@ Arrayable objects like Eloquent models and collections are automatically convert
 
 When passing props to your components, you may want to create custom classes that can transform themselves into the appropriate data format. While Laravel's `Arrayable` interface simply converts objects to arrays, Inertia offers the more powerful `ProvidesInertiaProperty` interface for context-aware transformations.
 
-This interface requires a `toInertiaProperty` method that receives a `PropertyContext`object containing the property key (`$context->key`), all props for the page (`$context->props`), and the request instance (`$context->request`).
+This interface requires a `toInertiaProperty` method that receives a `PropertyContext` object containing the property key (`$context->key`), all props for the page (`$context->props`), and the request instance (`$context->request`).
 
 ```php
 use Inertia\PropertyContext;

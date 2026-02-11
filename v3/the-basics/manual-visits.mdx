@@ -27,6 +27,7 @@ router.visit(url, {
   reset: [],
   preserveUrl: false,
   prefetch: false,
+  preserveErrors: false,
   viewTransition: false,
   onCancelToken: (cancelToken) => {},
   onCancel: () => {},
@@ -35,6 +36,8 @@ router.visit(url, {
   onProgress: (progress) => {},
   onSuccess: (page) => {},
   onError: (errors) => {},
+  onHttpException: (response) => {},
+  onNetworkError: (error) => {},
   onFinish: (visit) => {},
   onPrefetching: () => {},
   onPrefetched: () => {},
@@ -62,6 +65,7 @@ router.visit(url, {
   reset: [],
   preserveUrl: false,
   prefetch: false,
+  preserveErrors: false,
   viewTransition: false,
   onCancelToken: (cancelToken) => {},
   onCancel: () => {},
@@ -70,6 +74,8 @@ router.visit(url, {
   onProgress: (progress) => {},
   onSuccess: (page) => {},
   onError: (errors) => {},
+  onHttpException: (response) => {},
+  onNetworkError: (error) => {},
   onFinish: (visit) => {},
   onPrefetching: () => {},
   onPrefetched: () => {},
@@ -97,6 +103,7 @@ router.visit(url, {
   reset: [],
   preserveUrl: false,
   prefetch: false,
+  preserveErrors: false,
   viewTransition: false,
   onCancelToken: (cancelToken) => {},
   onCancel: () => {},
@@ -105,6 +112,8 @@ router.visit(url, {
   onProgress: (progress) => {},
   onSuccess: (page) => {},
   onError: (errors) => {},
+  onHttpException: (response) => {},
+  onNetworkError: (error) => {},
   onFinish: (visit) => {},
   onPrefetching: () => {},
   onPrefetched: () => {},
@@ -184,8 +193,6 @@ Uploading files via `put` or `patch` is not supported in Laravel. Instead, make 
 
 ## Wayfinder
 
-<Badge>v2.1.2+</Badge>
-
 When using [Wayfinder](https://github.com/laravel/wayfinder), you can pass the resulting object directly to any router method. The router will infer the HTTP method and URL from the Wayfinder object.
 
 <CodeGroup>
@@ -219,7 +226,7 @@ router.delete(destroy(1));
 
 </CodeGroup>
 
-If you provide both a Wayfinder object and specify the `method` option, the `method`option will take precedence.
+If you provide both a Wayfinder object and specify the `method` option, the `method` option will take precedence.
 
 <CodeGroup>
 
@@ -688,7 +695,9 @@ import { router } from '@inertiajs/vue3'
 router.prependToProp('notifications', (current, props) => {
     return {
         id: Date.now(),
-        message: `Hello ${props.user.name}\
+        message: `Hello ${props.user.name}`,
+    }
+})
 ```
 
 ```js React icon="react"
@@ -697,7 +706,9 @@ import { router } from '@inertiajs/react'
 router.prependToProp('notifications', (current, props) => {
     return {
         id: Date.now(),
-        message: `Hello ${props.user.name}\
+        message: `Hello ${props.user.name}`,
+    }
+})
 ```
 
 ```js Svelte icon="s"
@@ -706,7 +717,9 @@ import { router } from '@inertiajs/svelte'
 router.prependToProp('notifications', (current, props) => {
     return {
         id: Date.now(),
-        message: `Hello ${props.user.name}\
+        message: `Hello ${props.user.name}`,
+    }
+})
 ```
 
 </CodeGroup>
@@ -993,6 +1006,8 @@ router.post("/users", data, {
   onProgress: (progress) => {},
   onSuccess: (page) => {},
   onError: (errors) => {},
+  onHttpException: (response) => {},
+  onNetworkError: (error) => {},
   onCancel: () => {},
   onFinish: (visit) => {},
   onPrefetching: () => {},
@@ -1009,6 +1024,8 @@ router.post("/users", data, {
   onProgress: (progress) => {},
   onSuccess: (page) => {},
   onError: (errors) => {},
+  onHttpException: (response) => {},
+  onNetworkError: (error) => {},
   onCancel: () => {},
   onFinish: (visit) => {},
   onPrefetching: () => {},
@@ -1025,6 +1042,8 @@ router.post("/users", data, {
   onProgress: (progress) => {},
   onSuccess: (page) => {},
   onError: (errors) => {},
+  onHttpException: (response) => {},
+  onNetworkError: (error) => {},
   onCancel: () => {},
   onFinish: (visit) => {},
   onPrefetching: () => {},
@@ -1034,26 +1053,32 @@ router.post("/users", data, {
 
 </CodeGroup>
 
-Returning `false` from the `onBefore()` callback will cause the visit to be cancelled.
+Returning `false` from the `onBefore()` callback will cause the visit to be cancelled. Returning `false` from `onHttpException()` or `onNetworkError()` will prevent the corresponding [global event](/v3/advanced/events) from being fired and its default behavior.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
 import { router } from '@inertiajs/vue3'
 
-router.delete(`/users/${user.id}\
+router.delete(`/users/${user.id}`, {
+    onBefore: () => confirm('Are you sure you want to delete this user?'),
+})
 ```
 
 ```js React icon="react"
 import { router } from '@inertiajs/react'
 
-router.delete(`/users/${user.id}\
+router.delete(`/users/${user.id}`, {
+    onBefore: () => confirm('Are you sure you want to delete this user?'),
+})
 ```
 
 ```js Svelte icon="s"
 import { router } from '@inertiajs/svelte'
 
-router.delete(`/users/${user.id}\
+router.delete(`/users/${user.id}`, {
+    onBefore: () => confirm('Are you sure you want to delete this user?'),
+})
 ```
 
 </CodeGroup>
@@ -1071,7 +1096,7 @@ router.post(url, {
             this.firstTask(),
             this.secondTask()
         ])
-    }
+    },
     onFinish: visit => {
         // Not called until firstTask() and secondTask() have finished
     },
@@ -1087,7 +1112,7 @@ router.post(url, {
             this.firstTask(),
             this.secondTask()
         ])
-    }
+    },
     onFinish: visit => {
         // Not called until firstTask() and secondTask() have finished
     },
@@ -1103,7 +1128,7 @@ router.post(url, {
             this.firstTask(),
             this.secondTask()
         ])
-    }
+    },
     onFinish: visit => {
         // Not called until firstTask() and secondTask() have finished
     },

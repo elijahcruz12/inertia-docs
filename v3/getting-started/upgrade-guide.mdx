@@ -1,104 +1,252 @@
 ---
-title: Upgrade Guide for v2.0
+title: Upgrade Guide for v3.0
 ---
 
-You can find the legacy docs for Inertia.js v1.0 at [inertiajs.com/docs/v1](/v1).
+You can find the legacy docs for Inertia.js v2.0 at [inertiajs.com/docs/v2](/v2).
 
 ## What's New
 
-Inertia.js v2.0 is a huge step forward for Inertia! The core library has been completely rewritten to architecturally support asynchronous requests, enabling a whole set of new features, including:
+Inertia.js v3.0 is a major release focused on simplicity and developer experience. Axios has been replaced with a built-in XHR client for a smaller bundle, SSR now works out of the box during development without a separate Node.js server, and the new `@inertiajs/vite` plugin handles page resolution and SSR configuration automatically. This release also introduces standalone HTTP requests via the `useHttp` hook, optimistic updates with automatic rollback, layout props for sharing data between pages and layouts, and improved exception handling.
 
 <Columns cols={2}>
-  <Card title="Polling" href="/v3/data-props/polling" icon="clock">
-    Keep data fresh by automatically polling the server at a specified interval.
-  </Card>
-  <Card title="Prefetching" href="/v3/data-props/prefetching" icon="rocket">
-    Speed up navigation by prefetching data for links when they become visible.
-  </Card>
-  <Card
-    title="Deferred props"
-    href="/v3/data-props/deferred-props"
-    icon="timer"
-  >
-    Load non-essential data after the initial page load to improve performance.
-  </Card>
-  <Card
-    title="Infinite scrolling"
-    href="/v3/data-props/merging-props"
-    icon="refresh"
-  >
-    Seamlessly load more data as the user scrolls down the page.
-  </Card>
-  <Card
-    title="Lazy loading data on scroll"
-    href="/v3/data-props/load-when-visible"
-    icon="mouse"
-  >
-    Load data only when it becomes visible in the viewport.
-  </Card>
-  <Card
-    title="History encryption"
-    href="/v3/security/history-encryption"
-    icon="lock"
-  >
-    Clear page data from browser history state when logging out of an
-    application.
-  </Card>
+    <Card title="Vite Plugin" href="/v3/installation/client-side-setup#installation" icon="bolt">
+        Automatic page resolution, SSR setup, and optional setup/resolve callbacks.
+    </Card>
+    <Card title="HTTP Requests" href="/v3/the-basics/http-requests" icon="globe">
+        Make standalone HTTP requests with the useHttp hook, without triggering page visits.
+    </Card>
+    <Card title="Optimistic Updates" href="/v3/the-basics/optimistic-updates" icon="sparkles">
+        Apply data changes instantly before the server responds, with automatic rollback on failure.
+    </Card>
+    <Card title="Layout Props" href="/v3/the-basics/layouts#layout-props" icon="layer-group">
+        Share dynamic data between pages and persistent layouts with the useLayoutProps hook.
+    </Card>
+    <Card title="Simplified SSR" href="/v3/advanced/server-side-rendering" icon="server">
+        SSR works automatically in Vite dev mode. No separate Node.js server needed.
+    </Card>
+    <Card title="Exception Handling" href="/v3/advanced/error-handling#production" icon="shield">
+        Render custom Inertia error pages directly from your exception handler, with shared data.
+    </Card>
 </Columns>
 
 ## Upgrade Dependencies
 
-To upgrade to the Inertia.js v2.0, first use npm to install the client-side adapter of your choice:
+To upgrade to Inertia.js v3.0, first use npm to install the client-side adapter of your choice:
 
 <CodeGroup>
 
 ```bash Vue icon="vuejs"
-npm install @inertiajs/vue3@^2.0
+npm install @inertiajs/vue3@^3.0
 ```
 
 ```bash React icon="react"
-npm install @inertiajs/react@^2.0
+npm install @inertiajs/react@^3.0
 ```
 
 ```bash Svelte icon="s"
-npm install @inertiajs/svelte@^2.0
+npm install @inertiajs/svelte@^3.0
 ```
 
 </CodeGroup>
 
-Next, upgrade the `inertiajs/inertia-laravel` package to use the `2.x` dev branch:
+You may also install the new optional Vite plugin, which provides a simplified SSR setup and a `pages` shorthand for component resolution:
 
 ```bash
-composer require inertiajs/inertia-laravel:^2.0
+npm install @inertiajs/vite@^0.1
+```
+
+Next, upgrade the `inertiajs/inertia-laravel` package:
+
+```bash
+composer require inertiajs/inertia-laravel:^3.0
+```
+
+After upgrading, you should clear your cached views since the `@inertia` Blade directive output has changed:
+
+```bash
+php artisan view:clear
 ```
 
 ## Breaking Changes
 
-While a significant release, Inertia.js v2.0 doesn't introduce many breaking changes. Here's a list of all the breaking changes:
+---
 
-### Dropped Laravel 8 and 9 Support
+### Requirements
 
-The Laravel adapter now requires Laravel 10 and PHP 8.1 at a minimum.
+#### PHP 8.2+ and Laravel 11+
 
-### Dropped Vue 2 Support
+The Laravel adapter now requires PHP 8.2 and Laravel 11 at a minimum.
 
-The Vue 2 adapter has been removed. Vue 2 reached End of Life on December 3, 2023, so this felt like it was time.
+#### React 19+
 
-### Router `replace` Method
+The React adapter now requires React 19. React 18 and below are no longer supported.
 
-The previously deprecated `router.replace` method has been re-instated, but its functionality has changed. It is now used to make [Client Side](/v3/the-basics/manual-visits#client-side-visits) page visits. To make server-side visits that replace the current history entry in the browser, use the `replace` option:
+#### Svelte 5+
 
-```javascript
-router.get("/users", { search: "John" }, { replace: true });
+The Svelte adapter now requires Svelte 5. Svelte 4 and below are no longer supported. All Svelte code should be updated to use the Svelte 5 runes syntax (`$props()`, `$state()`, `$effect()`, etc).
+
+### Axios Removed
+
+Inertia no longer ships with or requires Axios. A built-in XHR client is used instead. If your application relies on Axios interceptors for Inertia requests, you may provide a custom HTTP client. See the [client-side setup](/v3/installation/client-side-setup) documentation for more details.
+
+### Event Renames
+
+Two global events have been renamed for clarity:
+
+| v2 Name | v3 Name | Document Event |
+|---|---|---|
+| `invalid` | `httpException` | `inertia:httpException` |
+| `exception` | `networkError` | `inertia:networkError` |
+
+Global event listeners should be updated accordingly:
+
+```js
+// Before (v2)
+router.on('invalid', (event) => { ... })
+router.on('exception', (event) => { ... })
+
+// After (v3)
+router.on('httpException', (event) => { ... })
+router.on('networkError', (event) => { ... })
 ```
 
-### Svelte Adapter
+You may also handle these events per-visit using the new `onHttpException` and `onNetworkError` callbacks:
 
-- Dropped support for Svelte 3 as it reached End of Life on June 20, 2023.
-- The `remember` helper has been rename to `useRemember` to be consistent with other helpers.
-- Updated `setup` callback in `app.js`. You need to pass `props` when initializing the `App` component. [See setup in app.js](/v3/installation/client-side-setup#initialize-the-inertia-app)
-- `setup` callback is now required in `ssr.js`. [See setup in ssr.js](/v3/advanced/server-side-rendering#add-server-entry-point)
+```js
+router.post('/users', data, {
+    onHttpException: (event) => { ... },
+    onNetworkError: (event) => { ... },
+})
+```
 
-### Partial Reloads Are Now Async
+### Future Options Removed
 
-Previously partial reloads in Inertia were synchronous, just like all Inertia requests. In v2.0, partial reloads are now asynchronous. Generally this is desirable, but if you were relying on these requests being synchronous, you may need to adjust your code.
+The `future` configuration namespace has been replaced by `legacy`, with inverted logic. Three future options have been removed entirely as their behavior is now always enabled:
+
+- `future.preserveEqualProps`
+- `future.useDataInertiaHeadAttribute`
+- `future.useDialogForErrorModal`
+
+```js
+// Before (v2)
+createInertiaApp({
+    defaults: {
+        future: {
+            preserveEqualProps: true,
+            useDataInertiaHeadAttribute: true,
+            useDialogForErrorModal: true,
+        },
+    },
+})
+
+// After (v3) - just remove the `future` block
+createInertiaApp({
+    // ...
+})
+```
+
+The fourth option, `future.useScriptElementForInitialPage`, has been flipped to `legacy.useDataAttributeForInitialPage`. The script element is now the default, so you only need this option if you want to revert to the old data attribute behavior:
+
+```js
+createInertiaApp({
+    defaults: {
+        legacy: {
+            useDataAttributeForInitialPage: true,
+        },
+    },
+})
+```
+
+Laravel users should also set the `pages.use_data_attribute_for_initial_page` option to `true` in their `config/inertia.php` file so the `@inertia` Blade directive outputs a data attribute instead of a script element.
+
+### Progress Indicator Exports Removed
+
+The named exports `hideProgress()` and `revealProgress()` have been removed. If needed, use the `progress` object directly:
+
+```js
+import { progress } from '@inertiajs/vue3'
+
+progress.hide()
+progress.reveal()
+```
+
+### Deferred Component Behavior (React)
+
+The React `<Deferred>` component no longer resets to show the fallback during partial reloads. Previously, the fallback was shown each time a partial reload was triggered. Now the existing content remains visible while new data loads, consistent with the Vue and Svelte behavior.
+
+A new `reloading` slot prop is available across all adapters, allowing you to show a loading indicator during partial reloads while keeping the existing content visible. See the [deferred props](/v3/data-props/deferred-props#reloading) documentation for details.
+
+### Form Processing Reset Timing
+
+The `useForm` helper now only resets `processing` and `progress` state in the `onFinish` callback, rather than immediately upon receiving a response. This ensures the processing state remains `true` until the visit is fully complete.
+
+### LazyProp Removed
+
+The `Inertia::lazy()` method and `LazyProp` class, deprecated in v2, have been removed. Use `Inertia::optional()` instead, which provides the same functionality:
+
+```php
+// Before (v2)
+return Inertia::render('Users/Index', [
+    'users' => Inertia::lazy(fn () => User::all()),
+]);
+
+// After (v3)
+return Inertia::render('Users/Index', [
+    'users' => Inertia::optional(fn () => User::all()),
+]);
+```
+
+### Config File Restructuring
+
+The Laravel configuration file has been restructured. Page-related settings are now nested under `pages`, and the `testing` section has been simplified:
+
+```php
+// Before (v2) - config/inertia.php
+'testing' => [
+    'ensure_pages_exist' => true,
+    'page_paths' => [resource_path('js/Pages')],
+    'page_extensions' => ['js', 'jsx', 'svelte', 'ts', 'tsx', 'vue'],
+],
+
+// After (v3) - config/inertia.php
+'pages' => [
+    'ensure_pages_exist' => false,
+    'paths' => [resource_path('js/Pages')],
+    'extensions' => ['js', 'jsx', 'svelte', 'ts', 'tsx', 'vue'],
+    'use_data_attribute_for_initial_page' => false,
+],
+
+'testing' => [
+    'ensure_pages_exist' => true,
+],
+```
+
+The `use_data_attribute_for_initial_page` option is now under the `pages` key. When set to `true`, the `@inertia` Blade directive outputs a data attribute instead of a script element.
+
+You may publish the updated config file using:
+
+```bash
+php artisan vendor:publish --tag=inertia-config --force
+```
+
+### SSR Setup Simplified
+
+Inertia v3 introduces the `@inertiajs/vite` plugin, which automates the SSR setup during development. In dev mode, the Vite plugin handles SSR rendering directly, so no separate Node.js server is needed. See the [server-side rendering](/v3/advanced/server-side-rendering) documentation for the updated setup.
+
+### Miscellaneous
+
+#### ESM-Only Packages
+
+All Inertia packages now ship as ES Modules only. CommonJS `require()` imports are no longer supported. You should update any `require()` calls to use `import` statements instead.
+
+#### `qs` Dependency Removed
+
+The `qs` package has been replaced with a built-in query string implementation and is no longer included as a dependency of `@inertiajs/core`. Inertia's internal query string handling remains the same, but you should install `qs` directly if your application imports it.
+
+```bash
+npm install qs
+```
+
+#### Middleware Priority
+
+The Inertia middleware is now automatically registered in Laravel's [middleware priority](https://laravel.com/docs/middleware#sorting-middleware) list, ensuring it runs before middleware like `ThrottleRequests`. This fixes an issue where `PUT`/`PATCH`/`DELETE` requests that were rate-limited could receive a `302` redirect instead of the correct `303`, causing the browser to retry the original request method on the redirect target. No action is required.

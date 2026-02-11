@@ -254,6 +254,111 @@ const form = useForm<{
 });
 ```
 
+## Form Component
+
+The `<Form>` component accepts a generic type parameter for type-safe slot props. In React, you may pass the generic directly. In Vue and Svelte, you may use the `createForm` helper to create a typed form component.
+
+<CodeGroup>
+
+```tsx React icon="react"
+import { Form } from "@inertiajs/react";
+
+interface UserForm {
+  name: string;
+  email: string;
+}
+
+export default function CreateUser() {
+  return (
+    <Form<UserForm> action="/users" method="post">
+      {({ errors }) => (
+        <>
+          <input type="text" name="name" />
+          {errors.name && <div>{errors.name}</div>}
+          <button type="submit">Create User</button>
+        </>
+      )}
+    </Form>
+  );
+}
+```
+
+```vue Vue icon="vuejs"
+<script setup lang="ts">
+import { createForm } from "@inertiajs/vue3";
+
+interface UserForm {
+  name: string;
+  email: string;
+}
+
+const TypedForm = createForm<UserForm>();
+</script>
+
+<template>
+  <TypedForm action="/users" method="post" #default="{ errors }">
+    <input type="text" name="name" />
+    <div v-if="errors.name">{{ errors.name }}</div>
+    <button type="submit">Create User</button>
+  </TypedForm>
+</template>
+```
+
+```svelte Svelte icon="s"
+<script lang="ts">
+    import { createForm } from '@inertiajs/svelte'
+
+    interface UserForm {
+        name: string
+        email: string
+    }
+
+    const TypedForm = createForm<UserForm>()
+</script>
+
+<TypedForm action="/users" method="post">
+    {#snippet children({ errors })}
+        <input type="text" name="name" />
+        {#if errors.name}<div>{errors.name}</div>{/if}
+        <button type="submit">Create User</button>
+    {/snippet}
+</TypedForm>
+```
+
+</CodeGroup>
+
+The generic provides autocomplete and type checking for the `errors` object, `setError`, `clearErrors`, and other slot props that reference form fields.
+
+### useFormContext
+
+The `useFormContext()` function also accepts a generic type parameter, providing type-safe access to the form context from child components.
+
+<CodeGroup>
+
+```tsx React icon="react"
+import { useFormContext } from "@inertiajs/react";
+
+const form = useFormContext<UserForm>();
+```
+
+```vue Vue icon="vuejs"
+<script setup lang="ts">
+import { useFormContext } from "@inertiajs/vue3";
+
+const form = useFormContext<UserForm>();
+</script>
+```
+
+```svelte Svelte icon="s"
+<script lang="ts">
+    import { useFormContext } from '@inertiajs/svelte'
+
+    const form = useFormContext<UserForm>()
+</script>
+```
+
+</CodeGroup>
+
 ## Remembering State
 
 The `useRemember` hook accepts a generic type parameter for type-safe local state persistence, providing autocomplete and ensuring values match the expected types.

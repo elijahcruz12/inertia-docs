@@ -192,8 +192,11 @@
                             "v3/the-basics/links",
                             "v3/the-basics/manual-visits",
                             "v3/the-basics/forms",
+                            "v3/the-basics/http-requests",
+                            "v3/the-basics/optimistic-updates",
                             "v3/the-basics/file-uploads",
                             "v3/the-basics/validation",
+                            "v3/the-basics/layouts",
                             "v3/the-basics/view-transitions"
                         ]
                     },
@@ -339,6 +342,22 @@
         {
             "source": "/view-transitions",
             "destination": "/v3/the-basics/view-transitions"
+        },
+        {
+            "source": "/http-requests",
+            "destination": "/v3/the-basics/http-requests"
+        },
+        {
+            "source": "/optimistic-updates",
+            "destination": "/v3/the-basics/optimistic-updates"
+        },
+        {
+            "source": "/layout-props",
+            "destination": "/v3/the-basics/layouts"
+        },
+        {
+            "source": "/v3/the-basics/layout-props",
+            "destination": "/v3/the-basics/layouts"
         },
         {
             "source": "/shared-data",

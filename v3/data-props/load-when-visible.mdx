@@ -36,25 +36,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { WhenVisible } from '@inertiajs/svelte'
-
-    export let permissions
-</script>
-
-<WhenVisible data="permissions">
-    <svelte:fragment slot="fallback">
-        <div>Loading...</div>
-    </svelte:fragment>
-
-    {#each permissions as permission}
-        <!-- ... -->
-    {/each}
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { WhenVisible } from '@inertiajs/svelte'
 
@@ -104,24 +86,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { WhenVisible } from '@inertiajs/svelte'
-
-    export let teams
-    export let users
-</script>
-
-<WhenVisible data={['teams', 'users']}>
-    <svelte:fragment slot="fallback">
-        <div>Loading...</div>
-    </svelte:fragment>
-
-    <!-- Props are now loaded -->
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { WhenVisible } from '@inertiajs/svelte'
 
@@ -177,25 +142,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { WhenVisible } from '@inertiajs/svelte'
-
-    export let permissions
-</script>
-
-<WhenVisible data="permissions" buffer={500}>
-    <svelte:fragment slot="fallback">
-        <div>Loading...</div>
-    </svelte:fragment>
-
-    {#each permissions as permission}
-        <!-- ... -->
-    {/each}
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { WhenVisible } from '@inertiajs/svelte'
 
@@ -243,19 +190,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { WhenVisible } from '@inertiajs/svelte'
-
-    export let products
-</script>
-
-<WhenVisible data="products" as="span">
-    <!-- ... -->
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { WhenVisible } from '@inertiajs/svelte'
 
@@ -271,7 +206,7 @@ export default () => (
 
 ## Always Trigger
 
-By default, the `WhenVisible` component will only trigger once when the element becomes visible. If you want to always trigger the data loading when the element is visible, you can provide the `always`prop.
+By default, the `WhenVisible` component will only trigger once when the element becomes visible. If you want to always trigger the data loading when the element is visible, you can provide the `always` prop.
 
 This is useful when you want to load data every time the element becomes visible, such as when the element is at the end of an infinite scroll list and you want to load more data. Alternatively, you can use the [Infinite scroll](/v3/data-props/infinite-scroll) component which handles this use case for you.
 
@@ -301,19 +236,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { WhenVisible } from '@inertiajs/svelte'
-
-    export let products
-</script>
-
-<WhenVisible data="products" always>
-    <!-- ... -->
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { WhenVisible } from '@inertiajs/svelte'
 
@@ -367,26 +290,7 @@ export default () => (
 );
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { WhenVisible } from '@inertiajs/svelte'
-
-    export let permissions
-</script>
-
-<WhenVisible data="permissions" always let:fetching>
-    <PermissionsChildComponent />
-    {#if fetching}
-        <div>Refreshing...</div>
-    {/if}
-
-    <svelte:fragment slot="fallback">
-        <div>Loading...</div>
-    </svelte:fragment>
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { WhenVisible } from '@inertiajs/svelte'
 
@@ -402,6 +306,32 @@ export default () => (
     {#snippet fallback()}
         <div>Loading...</div>
     {/snippet}
+</WhenVisible>
+```
+
+</CodeGroup>
+
+## Preserving Errors
+
+The `WhenVisible` component sets `preserveErrors: true` by default, ensuring that validation errors are not cleared when it triggers a reload. You may override this via the `params` prop.
+
+<CodeGroup>
+
+```vue Vue icon="vuejs"
+<WhenVisible data="comments" :params="{ preserveErrors: false }">
+    <!-- ... -->
+</WhenVisible>
+```
+
+```jsx React icon="react"
+<WhenVisible data="comments" params={{ preserveErrors: false }}>
+    {/* ... */}
+</WhenVisible>
+```
+
+```svelte Svelte icon="s"
+<WhenVisible data="comments" params={{ preserveErrors: false }}>
+    <!-- ... -->
 </WhenVisible>
 ```
 
@@ -466,32 +396,7 @@ export default function CreateUser() {
 }
 ```
 
-```svelte Svelte 4 icon="s"
-<script>
-    import { useForm, WhenVisible } from '@inertiajs/svelte'
-
-    const form = useForm({
-        name: '',
-        email: '',
-    })
-
-    function submit() {
-        $form.post('/users', {
-            except: ['permissions'],
-        })
-    }
-</script>
-
-<form on:submit|preventDefault={submit}>
-    <!-- ... -->
-</form>
-
-<WhenVisible data="permissions">
-    <!-- ... -->
-</WhenVisible>
-```
-
-```svelte Svelte 5 icon="s"
+```svelte Svelte icon="s"
 <script>
     import { useForm, WhenVisible } from '@inertiajs/svelte'
 
