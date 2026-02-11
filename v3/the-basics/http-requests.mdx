@@ -11,7 +11,7 @@ Not every request needs to trigger an Inertia page visit. For calls to an extern
 
 ## Basic Usage
 
-The `useHttp` hook accepts initial form data and returns reactive state along with methods for making HTTP requests.
+The `useHttp` hook accepts initial data and returns reactive state along with methods for making HTTP requests.
 
 <CodeGroup>
 
@@ -19,12 +19,12 @@ The `useHttp` hook accepts initial form data and returns reactive state along wi
 <script setup>
 import { useHttp } from '@inertiajs/vue3'
 
-const form = useHttp({
+const http = useHttp({
     query: '',
 })
 
 function search() {
-    form.get('/api/search', {
+    http.get('/api/search', {
         onSuccess: (response) => {
             console.log(response)
         },
@@ -33,8 +33,8 @@ function search() {
 </script>
 
 <template>
-    <input v-model="form.query" @input="search" />
-    <div v-if="form.processing">Searching...</div>
+    <input v-model="http.query" @input="search" />
+    <div v-if="http.processing">Searching...</div>
 </template>
 ```
 
@@ -68,12 +68,12 @@ export default function Search() {
 <script>
 import { useHttp } from '@inertiajs/svelte'
 
-const form = useHttp({
+const http = useHttp({
     query: '',
 })
 
 function search() {
-    $form.get('/api/search', {
+    $http.get('/api/search', {
         onSuccess: (response) => {
             console.log(response)
         },
@@ -81,8 +81,8 @@ function search() {
 }
 </script>
 
-<input bind:value={$form.query} oninput={search} />
-{#if $form.processing}
+<input bind:value={$http.query} oninput={search} />
+{#if $http.processing}
     <div>Searching...</div>
 {/if}
 ```
@@ -98,12 +98,12 @@ The hook provides `get`, `post`, `put`, `patch`, and `delete` convenience method
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-form.get(url, options)
-form.post(url, options)
-form.put(url, options)
-form.patch(url, options)
-form.delete(url, options)
-form.submit(method, url, options)
+http.get(url, options)
+http.post(url, options)
+http.put(url, options)
+http.patch(url, options)
+http.delete(url, options)
+http.submit(method, url, options)
 ```
 
 ```js React icon="react"
@@ -118,12 +118,12 @@ submit(method, url, options)
 ```
 
 ```js Svelte icon="s"
-$form.get(url, options)
-$form.post(url, options)
-$form.put(url, options)
-$form.patch(url, options)
-$form.delete(url, options)
-$form.submit(method, url, options)
+$http.get(url, options)
+$http.post(url, options)
+$http.put(url, options)
+$http.patch(url, options)
+$http.delete(url, options)
+$http.submit(method, url, options)
 ```
 
 </CodeGroup>
@@ -133,7 +133,7 @@ Each method returns a `Promise` that resolves with the parsed JSON response data
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-const response = await form.post('/api/comments', {
+const response = await http.post('/api/comments', {
     onError: (errors) => {
         console.log(errors)
     },
@@ -149,7 +149,7 @@ const response = await post('/api/comments', {
 ```
 
 ```js Svelte icon="s"
-const response = await $form.post('/api/comments', {
+const response = await $http.post('/api/comments', {
     onError: (errors) => {
         console.log(errors)
     },
@@ -164,7 +164,6 @@ The `useHttp` hook exposes the same reactive properties as `useForm`:
 
 | Property | Type | Description |
 |---|---|---|
-| `data` | `TForm` | The current form data |
 | `errors` | `object` | Validation errors keyed by field name |
 | `hasErrors` | `boolean` | Whether validation errors exist |
 | `processing` | `boolean` | Whether a request is in progress |
@@ -172,7 +171,6 @@ The `useHttp` hook exposes the same reactive properties as `useForm`:
 | `wasSuccessful` | `boolean` | Whether the last request was successful |
 | `recentlySuccessful` | `boolean` | `true` for two seconds after a successful request |
 | `isDirty` | `boolean` | Whether the data differs from its defaults |
-| `response` | `TResponse \| null` | The last successful response data |
 
 ## Validation Errors
 
@@ -184,24 +182,24 @@ When a request returns a `422` status code, the hook automatically parses valida
 <script setup>
 import { useHttp } from '@inertiajs/vue3'
 
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 })
 
 function save() {
-    form.post('/api/users')
+    http.post('/api/users')
 }
 </script>
 
 <template>
-    <input v-model="form.name" />
-    <div v-if="form.errors.name">{{ form.errors.name }}</div>
+    <input v-model="http.name" />
+    <div v-if="http.errors.name">{{ http.errors.name }}</div>
 
-    <input v-model="form.email" />
-    <div v-if="form.errors.email">{{ form.errors.email }}</div>
+    <input v-model="http.email" />
+    <div v-if="http.errors.email">{{ http.errors.email }}</div>
 
-    <button @click="save" :disabled="form.processing">Save</button>
+    <button @click="save" :disabled="http.processing">Save</button>
 </template>
 ```
 
@@ -237,27 +235,27 @@ export default function CreateUser() {
 <script>
 import { useHttp } from '@inertiajs/svelte'
 
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 })
 
 function save() {
-    $form.post('/api/users')
+    $http.post('/api/users')
 }
 </script>
 
-<input bind:value={$form.name} />
-{#if $form.errors.name}
-    <div>{$form.errors.name}</div>
+<input bind:value={$http.name} />
+{#if $http.errors.name}
+    <div>{$http.errors.name}</div>
 {/if}
 
-<input bind:value={$form.email} />
-{#if $form.errors.email}
-    <div>{$form.errors.email}</div>
+<input bind:value={$http.email} />
+{#if $http.errors.email}
+    <div>{$http.errors.email}</div>
 {/if}
 
-<button onclick={save} disabled={$form.processing}>Save</button>
+<button onclick={save} disabled={$http.processing}>Save</button>
 ```
 
 </CodeGroup>
@@ -269,30 +267,30 @@ By default, validation errors are simplified to the first error message for each
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 }).withAllErrors()
 
-// form.errors.name === ['Name is required.', 'Name must be at least 3 characters.']
+// http.errors.name === ['Name is required.', 'Name must be at least 3 characters.']
 ```
 
 ```js React icon="react"
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 }).withAllErrors()
 
-// form.errors.name === ['Name is required.', 'Name must be at least 3 characters.']
+// http.errors.name === ['Name is required.', 'Name must be at least 3 characters.']
 ```
 
 ```js Svelte icon="s"
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 }).withAllErrors()
 
-// $form.errors.name === ['Name is required.', 'Name must be at least 3 characters.']
+// $http.errors.name === ['Name is required.', 'Name must be at least 3 characters.']
 ```
 
 </CodeGroup>
@@ -301,7 +299,7 @@ The same method is available on the [`useForm`](/v3/the-basics/forms#options-2) 
 
 ## File Uploads
 
-When the form data includes files, the hook automatically sends the request as `multipart/form-data`. Upload progress is available through the `progress` property.
+When the data includes files, the hook automatically sends the request as `multipart/form-data`. Upload progress is available through the `progress` property.
 
 <CodeGroup>
 
@@ -309,19 +307,19 @@ When the form data includes files, the hook automatically sends the request as `
 <script setup>
 import { useHttp } from '@inertiajs/vue3'
 
-const form = useHttp({
+const http = useHttp({
     file: null,
 })
 
 function upload() {
-    form.post('/api/uploads')
+    http.post('/api/uploads')
 }
 </script>
 
 <template>
-    <input type="file" @change="form.file = $event.target.files[0]" />
-    <progress v-if="form.progress" :value="form.progress.percentage" max="100" />
-    <button @click="upload" :disabled="form.processing">Upload</button>
+    <input type="file" @change="http.file = $event.target.files[0]" />
+    <progress v-if="http.progress" :value="http.progress.percentage" max="100" />
+    <button @click="upload" :disabled="http.processing">Upload</button>
 </template>
 ```
 
@@ -347,20 +345,20 @@ export default function Upload() {
 <script>
 import { useHttp } from '@inertiajs/svelte'
 
-const form = useHttp({
+const http = useHttp({
     file: null,
 })
 
 function upload() {
-    $form.post('/api/uploads')
+    $http.post('/api/uploads')
 }
 </script>
 
-<input type="file" onchange={e => $form.file = e.target.files[0]} />
-{#if $form.progress}
-    <progress value={$form.progress.percentage} max="100" />
+<input type="file" onchange={e => $http.file = e.target.files[0]} />
+{#if $http.progress}
+    <progress value={$http.progress.percentage} max="100" />
 {/if}
-<button onclick={upload} disabled={$form.processing}>Upload</button>
+<button onclick={upload} disabled={$http.processing}>Upload</button>
 ```
 
 </CodeGroup>
@@ -372,7 +370,7 @@ You may cancel an in-progress request using the `cancel()` method.
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-form.cancel()
+http.cancel()
 ```
 
 ```js React icon="react"
@@ -382,19 +380,19 @@ cancel()
 ```
 
 ```js Svelte icon="s"
-$form.cancel()
+$http.cancel()
 ```
 
 </CodeGroup>
 
 ## Optimistic Updates
 
-The `useHttp` hook supports [optimistic updates](/v3/the-basics/optimistic-updates) via the `optimistic()` method. The callback receives the current form data and should return a partial update to apply immediately.
+The `useHttp` hook supports [optimistic updates](/v3/the-basics/optimistic-updates) via the `optimistic()` method. The callback receives the current data and should return a partial update to apply immediately.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-form.optimistic((data) => ({
+http.optimistic((data) => ({
     likes: data.likes + 1,
 })).post('/api/likes')
 ```
@@ -409,7 +407,7 @@ post('/api/likes')
 ```
 
 ```js Svelte icon="s"
-$form.optimistic((data) => ({
+$http.optimistic((data) => ({
     likes: data.likes + 1,
 })).post('/api/likes')
 ```
@@ -423,7 +421,7 @@ The update is applied synchronously. If the request fails, the data is rolled ba
 Each submit method accepts an options object with lifecycle callbacks:
 
 ```js
-form.post('/api/users', {
+http.post('/api/users', {
     onBefore: () => { ... },
     onStart: () => { ... },
     onProgress: (progress) => { ... },
@@ -445,7 +443,7 @@ The `useHttp` hook supports [Laravel Precognition](https://laravel.com/docs/prec
 ```js Vue icon="vuejs"
 import { useHttp } from '@inertiajs/vue3'
 
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 }).withPrecognition('post', '/api/users')
@@ -454,7 +452,7 @@ const form = useHttp({
 ```js React icon="react"
 import { useHttp } from '@inertiajs/react'
 
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 }).withPrecognition('post', '/api/users')
@@ -463,7 +461,7 @@ const form = useHttp({
 ```js Svelte icon="s"
 import { useHttp } from '@inertiajs/svelte'
 
-const form = useHttp({
+const http = useHttp({
     name: '',
     email: '',
 }).withPrecognition('post', '/api/users')
@@ -475,24 +473,24 @@ Once enabled, the `validate()`, `touch()`, `touched()`, `valid()`, and `invalid(
 
 ## History State
 
-You may persist form data and errors in browser history state by providing a remember key as the first argument.
+You may persist data and errors in browser history state by providing a remember key as the first argument.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-const form = useHttp('SearchForm', {
+const http = useHttp('SearchData', {
     query: '',
 })
 ```
 
 ```js React icon="react"
-const form = useHttp('SearchForm', {
+const http = useHttp('SearchData', {
     query: '',
 })
 ```
 
 ```js Svelte icon="s"
-const form = useHttp('SearchForm', {
+const http = useHttp('SearchData', {
     query: '',
 })
 ```
@@ -502,7 +500,7 @@ const form = useHttp('SearchForm', {
 You may exclude sensitive fields from being stored in history state using the `dontRemember()` method.
 
 ```js
-const form = useHttp('LoginForm', {
+const http = useHttp('Login', {
     email: '',
     token: '',
 }).dontRemember('token')
