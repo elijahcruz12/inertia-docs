@@ -184,7 +184,7 @@ If you prefer not to use the Vite plugin, you may configure SSR manually.
         ```
         </CodeGroup>
 
-        This file is going to look very similar to your app entry point, except it's not going to run in the browser, but rather in Node.js. Here's a complete example.
+        This file will look similar to your app entry point, but it runs in Node.js instead of the browser. Here's a complete example.
 
         <CodeGroup>
 
@@ -375,7 +375,7 @@ With the server running, you should be able to access your app within the browse
 ## Client-Side Hydration
 
 <ClientSpecific>
-Since your website will be server-side rendered, you should also update your `app.js` file to use hydration instead of normal rendering. This allows <VueSpecific>Vue</VueSpecific><ReactSpecific>React</ReactSpecific><SvelteSpecific>Svelte</SvelteSpecific> to pick up the server-rendered HTML and make it interactive without re-rendering it.
+You should also update your `app.js` file to use hydration instead of normal rendering. This allows <VueSpecific>Vue</VueSpecific><ReactSpecific>React</ReactSpecific><SvelteSpecific>Svelte</SvelteSpecific> to pick up the server-rendered HTML and make it interactive without re-rendering it.
 </ClientSpecific>
 
 <CodeGroup>
