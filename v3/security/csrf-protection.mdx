@@ -52,11 +52,21 @@ router.post("/users", {
 
 You can even use Inertia's [shared data](/v3/data-props/shared-data) functionality to automatically include the `csrf_token` with each response.
 
-However, a better approach is to use the CSRF functionality already built into [axios](https://github.com/axios/axios) for this. Axios is the HTTP library that Inertia uses under the hood.
+A better approach is to use Inertia's built-in XSRF token handling. Inertia's HTTP client automatically checks for the existence of an `XSRF-TOKEN` cookie and, when present, includes the token in an `X-XSRF-TOKEN` header for every request it makes.
 
-Axios automatically checks for the existence of an `XSRF-TOKEN` cookie. If it's present, it will then include the token in an `X-XSRF-TOKEN` header for any requests it makes.
+The easiest way to implement this is using server-side middleware. Simply include the `XSRF-TOKEN` cookie on each response, and then verify the token using the `X-XSRF-TOKEN` header sent in the requests from Inertia.
 
-The easiest way to implement this is using server-side middleware. Simply include the `XSRF-TOKEN`cookie on each response, and then verify the token using the `X-XSRF-TOKEN` header sent in the requests from axios.
+You may customize the cookie and header names via the `http` option in `createInertiaApp`.
+
+```js
+createInertiaApp({
+  http: {
+    xsrfCookieName: 'MY-XSRF-TOKEN',
+    xsrfHeaderName: 'X-MY-XSRF-TOKEN',
+  },
+  // ...
+})
+```
 
 ## Handling Mismatches
 

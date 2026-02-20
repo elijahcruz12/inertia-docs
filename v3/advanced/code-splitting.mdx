@@ -2,48 +2,59 @@
 title: Code Splitting
 ---
 
-Code splitting breaks apart the various pages of your application into smaller bundles, which are then loaded on demand when visiting new pages. This can significantly reduce the size of the initial JavaScript bundle loaded by the browser, improving the time to first render.
+By default, Inertia lazy-loads page components, splitting each page into its own bundle that is loaded on demand. This reduces the initial JavaScript bundle size but requires additional requests when visiting new pages.
 
-While code splitting is helpful for very large projects, it does require extra requests when visiting new pages. Generally speaking, if you're able to use a single bundle, your app is going to feel snappier.
+You may disable lazy loading to eagerly bundle all pages into a single file. Eager loading eliminates per-page requests but increases the initial bundle size.
 
-To enable code splitting, you will need to tweak the `resolve` callback in your `createInertiaApp()` configuration, and how you do this is different depending on which bundler you're using.
+## Vite Plugin
 
-## Using Vite
+The `lazy` option in the `pages` shorthand controls how page components are loaded. It defaults to `true`.
 
-Vite enables code splitting (or lazy-loading as they call it) by default when using their `import.meta.glob()` function, so simply omit the `{ eager: true }` option, or set it to `false`, to disable eager loading.
+```js
+createInertiaApp({
+    pages: {
+        lazy: false, // Bundle all pages into a single file
+    },
+    // ...
+})
+```
+
+## Manual Vite
+
+You may configure code splitting manually using Vite's `import.meta.glob()` function when not using the Inertia Vite plugin. Pass `{ eager: true }` to bundle all pages, or omit it to lazy-load them.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
 resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true }) // [!code --:2]
-    return pages[`./Pages/${name}.vue`]
-    const pages = import.meta.glob('./Pages/**/*.vue') // [!code ++:2]
+    const pages = import.meta.glob('./Pages/**/*.vue') // [!code --:2]
     return pages[`./Pages/${name}.vue`]()
+    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true }) // [!code ++:2]
+    return pages[`./Pages/${name}.vue`]
 },
 ```
 
 ```js React icon="react"
 resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true }) // [!code --:2]
-    return pages[`./Pages/${name}.jsx`]
-    const pages = import.meta.glob('./Pages/**/*.jsx') // [!code ++:2]
+    const pages = import.meta.glob('./Pages/**/*.jsx') // [!code --:2]
     return pages[`./Pages/${name}.jsx`]()
+    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true }) // [!code ++:2]
+    return pages[`./Pages/${name}.jsx`]
 },
 ```
 
 ```js Svelte icon="s"
 resolve: name => {
-    const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true }) // [!code --:2]
-    return pages[`./Pages/${name}.svelte`]
-    const pages = import.meta.glob('./Pages/**/*.svelte') // [!code ++:2]
+    const pages = import.meta.glob('./Pages/**/*.svelte') // [!code --:2]
     return pages[`./Pages/${name}.svelte`]()
+    const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true }) // [!code ++:2]
+    return pages[`./Pages/${name}.svelte`]
 },
 ```
 
 </CodeGroup>
 
-## Using Webpack
+## Webpack
 
 To use code splitting with Webpack, you will first need to enable [dynamic imports](https://github.com/tc39/proposal-dynamic-import) via a Babel plugin. Let's install it now.
 

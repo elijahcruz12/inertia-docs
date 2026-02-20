@@ -86,7 +86,7 @@ These starter kits are the absolute fastest way to start building a new Inertia 
 
 </Steps>
 
-## Pages Shorthand
+### Pages Shorthand
 
 You may use the `pages` shorthand to customize which directory to search for page components.
 
@@ -132,8 +132,66 @@ createInertiaApp({
 |---|---|
 | `path` | The directory to search for page components. |
 | `extension` | A string or array of file extensions (e.g., `'.tsx'` or `['.tsx', '.jsx']`). Defaults to your framework's extension. |
-| `eager` | Whether to use eager loading. Defaults to `true`. |
+| `lazy` | Whether to lazy-load page components. Defaults to `true`. See [code splitting](/v3/advanced/code-splitting). |
 | `transform` | A callback that receives the page name and page object, returning a transformed name. |
+
+
+## Manual Setup
+
+If you prefer not to use the Vite plugin, you may provide the `resolve` and `setup` callbacks manually. The `resolve` callback tells Inertia how to load a page component, and the `setup` callback initializes the client-side framework.
+
+<CodeGroup>
+
+```js Vue icon="vuejs"
+import { createApp, h } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
+
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+        return pages[`./Pages/${name}.vue`]
+    },
+    setup({ el, App, props, plugin }) {
+        createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .mount(el)
+    },
+})
+```
+
+```jsx React icon="react"
+import { createInertiaApp } from '@inertiajs/react'
+import { createRoot } from 'react-dom/client'
+
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+        return pages[`./Pages/${name}.jsx`]
+    },
+    setup({ el, App, props }) {
+        createRoot(el).render(<App {...props} />)
+    },
+})
+```
+
+```js Svelte icon="s"
+import { createInertiaApp } from '@inertiajs/svelte'
+import { mount } from 'svelte'
+
+createInertiaApp({
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
+        return pages[`./Pages/${name}.svelte`]
+    },
+    setup({ el, App, props }) {
+        mount(App, { target: el, props })
+    },
+})
+```
+
+</CodeGroup>
+
+By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see our [code splitting](/v3/advanced/code-splitting) documentation.
 
 ## Configuring Defaults
 
@@ -141,7 +199,6 @@ You may pass a `defaults` object to `createInertiaApp()` to configure default se
 
 ```js
 createInertiaApp({
-  // ...
   defaults: {
     form: {
       recentlySuccessfulDuration: 5000,
@@ -159,6 +216,7 @@ createInertiaApp({
       };
     },
   },
+  // ...
 });
 ```
 
@@ -235,18 +293,18 @@ If you change the `id` of the root element, be sure to update it [server-side](/
 
 ## HTTP Client
 
-Inertia uses a built-in XHR client for all requests. No additional HTTP libraries like Axios are required.
+Unlike Inertia 2 and earlier, Inertia 3 uses a built-in XHR client for all requests. No additional HTTP libraries like Axios are required.
 
 ### Using Axios
 
-If your application relies on Axios interceptors or a custom Axios instance, you may provide the `axiosAdapter` as the `http` option when creating your Inertia app.
+You may provide the `axiosAdapter` as the `http` option when creating your Inertia app. This is useful when your application requires a custom Axios instance.
 
 ```js
 import { axiosAdapter } from '@inertiajs/core'
 
 createInertiaApp({
-    // ...
-    http: axiosAdapter(),
+  http: axiosAdapter(),
+  // ...
 })
 ```
 
@@ -257,70 +315,88 @@ import axios from 'axios'
 import { axiosAdapter } from '@inertiajs/core'
 
 const instance = axios.create({
-    baseURL: '/api',
+  // ...
 })
 
-instance.interceptors.request.use(/* ... */)
-
 createInertiaApp({
-    // ...
-    http: axiosAdapter(instance),
+  http: axiosAdapter(instance),
+  // ...
 })
 ```
 
-## Manual Setup
+### Interceptors
 
-If you prefer not to use the Vite plugin, you may provide the `resolve` and `setup` callbacks manually. The `resolve` callback tells Inertia how to load a page component, and the `setup` callback initializes the client-side framework.
+The built-in XHR client supports interceptors for modifying requests, inspecting responses, or handling errors. These interceptors apply to all HTTP requests made by Inertia, including those from the router, `useForm`, `<Form>`, and `useHttp`.
 
 <CodeGroup>
 
 ```js Vue icon="vuejs"
-import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { http } from '@inertiajs/vue3'
 
-createInertiaApp({
-    resolve: name => {
-        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-        return pages[`./Pages/${name}.vue`]
-    },
-    setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .mount(el)
-    },
+const removeRequestHandler = http.onRequest((config) => {
+  config.headers['X-Custom-Header'] = 'value'
+  return config
 })
+
+const removeResponseHandler = http.onResponse((response) => {
+  console.log('Response status:', response.status)
+  return response
+})
+
+const removeErrorHandler = http.onError((error) => {
+  console.error('Request failed:', error)
+})
+
+// Remove a handler when it's no longer needed...
+removeRequestHandler()
 ```
 
-```jsx React icon="react"
-import { createInertiaApp } from '@inertiajs/react'
-import { createRoot } from 'react-dom/client'
+```js React icon="react"
+import { http } from '@inertiajs/react'
 
-createInertiaApp({
-    resolve: name => {
-        const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
-        return pages[`./Pages/${name}.jsx`]
-    },
-    setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />)
-    },
+const removeRequestHandler = http.onRequest((config) => {
+  config.headers['X-Custom-Header'] = 'value'
+  return config
 })
+
+const removeResponseHandler = http.onResponse((response) => {
+  console.log('Response status:', response.status)
+  return response
+})
+
+const removeErrorHandler = http.onError((error) => {
+  console.error('Request failed:', error)
+})
+
+// Remove a handler when it's no longer needed...
+removeRequestHandler()
 ```
 
 ```js Svelte icon="s"
-import { createInertiaApp } from '@inertiajs/svelte'
-import { mount } from 'svelte'
+import { http } from '@inertiajs/svelte'
 
-createInertiaApp({
-    resolve: name => {
-        const pages = import.meta.glob('./Pages/**/*.svelte', { eager: true })
-        return pages[`./Pages/${name}.svelte`]
-    },
-    setup({ el, App, props }) {
-        mount(App, { target: el, props })
-    },
+const removeRequestHandler = http.onRequest((config) => {
+  config.headers['X-Custom-Header'] = 'value'
+  return config
 })
+
+const removeResponseHandler = http.onResponse((response) => {
+  console.log('Response status:', response.status)
+  return response
+})
+
+const removeErrorHandler = http.onError((error) => {
+  console.error('Request failed:', error)
+})
+
+// Remove a handler when it's no longer needed...
+removeRequestHandler()
 ```
 
 </CodeGroup>
 
-By default we recommend eager loading your components, which will result in a single JavaScript bundle. However, if you'd like to lazy-load your components, see our [code splitting](/v3/advanced/code-splitting) documentation.
+Each `on*` method returns a cleanup function that removes the handler when called. Request handlers receive the request config and must return it (modified or not). Response handlers receive the response and must also return it. Handlers may be asynchronous.
+
+### Custom HTTP Client
+
+For full control over how requests are made, you may provide a completely custom HTTP client via the `http` option. A custom client must implement the `request` method, which receives an `HttpRequestConfig` and returns a promise resolving to an `HttpResponse`. Review the [xhrHttpClient.ts](https://github.com/inertiajs/inertia/blob/3.x/packages/core/src/xhrHttpClient.ts) source for a reference implementation.

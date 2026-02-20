@@ -950,7 +950,49 @@ router.visit("/another-page", { viewTransition: true });
 
 ## Visit Cancellation
 
-You can cancel a visit using a cancel token, which Inertia automatically generates and provides via the `onCancelToken()` callback prior to making the visit.
+You may cancel all in-flight visits using the `router.cancelAll()` method. By default, this cancels all synchronous, asynchronous, and prefetch requests.
+
+<CodeGroup>
+
+```js Vue icon="vuejs"
+import { router } from "@inertiajs/vue3";
+
+// Cancel all in-flight requests...
+router.cancelAll();
+```
+
+```js React icon="react"
+import { router } from "@inertiajs/react";
+
+// Cancel all in-flight requests...
+router.cancelAll();
+```
+
+```js Svelte icon="s"
+import { router } from "@inertiajs/svelte";
+
+// Cancel all in-flight requests...
+router.cancelAll();
+```
+
+</CodeGroup>
+
+You may selectively cancel specific request types by passing an options object.
+
+```js
+// Cancel only async requests (leaving sync and prefetch active)...
+router.cancelAll({ sync: false, prefetch: false });
+
+// Cancel only sync requests...
+router.cancelAll({ async: false, prefetch: false });
+
+// Cancel everything except prefetch requests...
+router.cancelAll({ prefetch: false });
+```
+
+### Cancel Tokens
+
+For more granular control, you may cancel individual visits using a cancel token. Inertia automatically generates a cancel token and provides it via the `onCancelToken()` callback prior to making the visit.
 
 <CodeGroup>
 

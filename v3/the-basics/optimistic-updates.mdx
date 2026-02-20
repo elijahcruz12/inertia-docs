@@ -253,6 +253,10 @@ Optimistic state is automatically reverted in several scenarios:
 - **Server errors**: When the request fails for any other reason, the original state is restored
 - **Interrupted visits**: When a new visit interrupts an in-flight request, the previous optimistic state is restored before the new optimistic update is applied
 
+### Concurrent Updates
+
+Multiple optimistic requests may be in flight at the same time. Inertia tracks which props each optimistic update touched, and server responses will not overwrite a prop until the last optimistic request that modified it has resolved.
+
 ## Inline Option
 
 You may also pass the optimistic callback directly in the visit options instead of chaining.

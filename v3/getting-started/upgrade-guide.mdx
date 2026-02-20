@@ -119,6 +119,21 @@ router.post('/users', data, {
 })
 ```
 
+### `router.cancel()` Replaced
+
+The `router.cancel()` method has been replaced by `router.cancelAll()`, which provides granular control over which request types to cancel:
+
+```js
+// Before (v2)
+router.cancel()
+
+// After (v3)
+router.cancelAll()
+router.cancelAll({ async: false, prefetch: false }) // Cancel only sync requests
+```
+
+See the [visit cancellation](/v3/the-basics/manual-visits#visit-cancellation) documentation for more details.
+
 ### Future Options Removed
 
 The `future` configuration namespace has been removed. All four future options from v2 are now always enabled and no longer configurable:
