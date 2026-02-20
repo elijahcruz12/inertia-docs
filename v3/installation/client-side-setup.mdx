@@ -210,7 +210,7 @@ createInertiaApp({
 
 ## Manual Setup
 
-If you prefer not to use the Vite plugin, you may provide the `resolve` and `setup` callbacks manually. The `resolve` callback tells Inertia how to load a page component, and the `setup` callback initializes the client-side framework.
+If you prefer not to use the Vite plugin, you may provide the `resolve` and `setup` callbacks manually. The `resolve` callback tells Inertia how to load a page component and receives the component name and the full [page object](/v3/core-concepts/the-protocol). The `setup` callback initializes the client-side framework.
 
 <CodeGroup>
 

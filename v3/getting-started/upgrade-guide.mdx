@@ -29,6 +29,14 @@ Inertia.js v3.0 is a major release focused on simplicity and developer experienc
     </Card>
 </Columns>
 
+This release also includes several additional improvements:
+
+- [Disable SSR per-route](/v3/advanced/server-side-rendering#disabling-ssr) via middleware or facade
+- [Enum support](/v3/the-basics/responses) in `Inertia::render()` responses
+- [Form component generics](/v3/advanced/typescript#form-component) for type-safe errors and slot props
+- [Page object in resolve callback](/v3/installation/client-side-setup#manual-setup) for context-aware component resolution
+- [Built-in HTTP interceptors](/v3/installation/client-side-setup#interceptors) without Axios
+
 ## Upgrade Dependencies
 
 To upgrade to Inertia.js v3.0, first use npm to install the client-side adapter of your choice:
@@ -230,6 +238,25 @@ You may publish the updated config file using:
 ```bash
 php artisan vendor:publish --tag=inertia-config --force
 ```
+
+### Resolve Callback Receives Page Object
+
+The `resolve` callback in `createInertiaApp` now receives the full page object as a second argument, giving you access to props, URL, and other page data when resolving components:
+
+```js
+createInertiaApp({
+    resolve: (name, page) => {
+        // page.props, page.url, etc. are now available
+    },
+    // ...
+})
+```
+
+This is a non-breaking addition. Existing resolve callbacks that only accept `name` will continue to work without changes.
+
+### Testing Concerns Removed
+
+The deprecated `Inertia\Testing\Concerns\Has`, `Inertia\Testing\Concerns\Matching`, and `Inertia\Testing\Concerns\Debugging` traits have been removed. These traits were deprecated in v1 and replaced by the `AssertableInertia` class. No action is required unless your application references these traits directly.
 
 ### SSR Setup Simplified
 

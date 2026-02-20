@@ -289,7 +289,7 @@ The `layout` callback supports all layout formats, including arrays for [nested 
 
 ### Using the Resolve Callback
 
-You may also set a default layout inside the `resolve` callback by mutating the resolved page component. This approach is useful when you need access to the resolved component itself.
+You may also set a default layout inside the `resolve` callback by mutating the resolved page component. The callback receives the component name and the full page object, which is useful when you need to conditionally apply layouts based on page data.
 
 <CodeGroup>
 
