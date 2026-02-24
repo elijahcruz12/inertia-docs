@@ -158,6 +158,17 @@ For more information on configuring these plugins, consult Laravel's [Vite docum
 
 </Steps>
 
+### React Strict Mode
+
+The React adapter supports enabling React's [Strict Mode](https://react.dev/reference/react/StrictMode) via the `strictMode` option.
+
+```jsx
+createInertiaApp({
+    strictMode: true,
+    // ...
+})
+```
+
 ### Pages Shorthand
 
 You may use the `pages` shorthand to customize which directory to search for page components.
