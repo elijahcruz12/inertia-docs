@@ -60,6 +60,14 @@ The recommended way to configure SSR is with the `@inertiajs/vite` plugin. This 
             },
         })
         ```
+
+        You may pass `false` to opt out of the plugin's automatic SSR handling, for example if you prefer to [configure SSR manually](#manual-setup) but still want to use the other features of the Vite plugin.
+
+        ```js vite.config.js
+        inertia({
+            ssr: false,
+        })
+        ```
     </Step>
 
     <Step title="Update your build script">
