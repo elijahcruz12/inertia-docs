@@ -266,6 +266,12 @@ Inertia shares data between the server and client via a page object. This object
   props](/v3/data-props/deferred-props).
 </ParamField>
 
+<ParamField body="sharedProps" type="array">
+  Array of top-level prop keys registered via `Inertia::share()`. Used by the
+  client to carry shared props over during [instant
+  visits](/v3/the-basics/instant-visits).
+</ParamField>
+
 <ParamField body="onceProps" type="object">
   Configuration for [once props](/v3/data-props/once-props) that should only be
   resolved once and reused on subsequent pages. Each entry maps a key to an

@@ -47,6 +47,7 @@
                             "v3/the-basics/title-and-meta",
                             "v3/the-basics/links",
                             "v3/the-basics/manual-visits",
+                            "v3/the-basics/instant-visits",
                             "v3/the-basics/forms",
                             "v3/the-basics/http-requests",
                             "v3/the-basics/optimistic-updates",
@@ -342,6 +343,10 @@
         {
             "source": "/view-transitions",
             "destination": "/v3/the-basics/view-transitions"
+        },
+        {
+            "source": "/instant-visits",
+            "destination": "/v3/the-basics/instant-visits"
         },
         {
             "source": "/http-requests",
