@@ -52,15 +52,15 @@ To upgrade to Inertia.js v3.0, first use npm to install the client-side adapter 
 <CodeGroup>
 
 ```bash Vue icon="vuejs"
-npm install @inertiajs/vue3@^3.0
+npm install @inertiajs/vue3@^3.0.0-beta
 ```
 
 ```bash React icon="react"
-npm install @inertiajs/react@^3.0
+npm install @inertiajs/react@^3.0.0-beta
 ```
 
 ```bash Svelte icon="s"
-npm install @inertiajs/svelte@^3.0
+npm install @inertiajs/svelte@^3.0.0-beta
 ```
 
 </CodeGroup>
@@ -68,13 +68,13 @@ npm install @inertiajs/svelte@^3.0
 You may also install the new optional Vite plugin, which provides a simplified SSR setup and a `pages` shorthand for component resolution:
 
 ```bash
-npm install @inertiajs/vite@^0.1
+npm install @inertiajs/vite@^3.0.0-beta
 ```
 
 Next, upgrade the `inertiajs/inertia-laravel` package:
 
 ```bash
-composer require inertiajs/inertia-laravel:^3.0
+composer require inertiajs/inertia-laravel:^3.0.0-beta
 ```
 
 After upgrading, you should clear your cached views since the `@inertia` Blade directive output has changed:
@@ -140,6 +140,17 @@ You may also handle these events per-visit using the new `onHttpException` and `
 router.post('/users', data, {
     onHttpException: (response) => { ... },
     onNetworkError: (error) => { ... },
+})
+```
+
+Returning `false` from the `onHttpException` callback or calling `event.preventDefault()` on the global `httpException` event will prevent Inertia from navigating to the error page. This allows you to handle HTTP exceptions (4xx and 5xx responses) without leaving the current page.
+
+```js
+router.post('/users', data, {
+    onHttpException: (response) => {
+        // Handle the error without navigating
+        return false
+    },
 })
 ```
 
