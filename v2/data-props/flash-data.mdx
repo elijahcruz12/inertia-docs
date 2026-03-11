@@ -277,4 +277,8 @@ declare module '@inertiajs/core' {
 }
 ```
 
+<Note>
+The `import` statement (or `export {}`) is required to make this file a module. Without it, `declare module` replaces the module definition instead of augmenting it.
+</Note>
+
 With this configuration, `page.flash.toast` will be properly typed as `{ type: "success" | "error"; message: string } | undefined`.

@@ -172,12 +172,19 @@ When enabled, each field will contain an array of error strings instead of a sin
 You may configure TypeScript to expect arrays instead of strings in a `global.d.ts` file.
 
 ```ts
+// global.d.ts
+import '@inertiajs/core'
+
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
         errorValueType: string[]
     }
 }
 ```
+
+<Note>
+The `import` statement (or `export {}`) is required to make this file a module. Without it, `declare module` replaces the module definition instead of augmenting it.
+</Note>
 
 ## Repopulating Input
 
