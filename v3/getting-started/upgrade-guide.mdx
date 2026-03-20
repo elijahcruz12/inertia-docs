@@ -119,6 +119,14 @@ The `qs` package has been replaced with a built-in query string implementation a
 npm install qs
 ```
 
+### `lodash-es` Dependency Removed
+
+The `lodash-es` package has been replaced with `es-toolkit` and is no longer included as a dependency of `@inertiajs/core`. You should install `lodash-es` directly if your application imports it.
+
+```bash
+npm install lodash-es
+```
+
 ### Event Renames
 
 Two global events have been renamed for clarity:
@@ -314,6 +322,10 @@ return Inertia::render('Dashboard', [
     ],
 ]);
 ```
+
+### ES2022 Build Target
+
+Inertia packages now target ES2022, up from ES2020 in v2. You may use the [`@vitejs/plugin-legacy`](https://www.npmjs.com/package/@vitejs/plugin-legacy) Vite plugin if your application needs to support older browsers.
 
 ### ESM-Only Packages
 
