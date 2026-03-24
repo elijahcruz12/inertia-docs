@@ -35,7 +35,7 @@ These starter kits are the absolute fastest way to start building a new Inertia 
     </Step>
 
     <Step title="Setup root template">
-        Next, create a `resources/views/app.blade.php` file. This root template will be loaded on the first page visit to your application, and should include your assets along with the `@inertia` and `@inertiaHead` directives.
+        Next, create a `resources/views/app.blade.php` file. This root template will be loaded on the first page visit to your application. Inertia provides Blade components for rendering the head and body content.
 
         ```blade resources/views/app.blade.php
         <html>
@@ -43,28 +43,49 @@ These starter kits are the absolute fastest way to start building a new Inertia 
                 <meta charset="utf-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 @vite('resources/js/app.js')
-                @inertiaHead
+                <x-inertia::head />
             </head>
             <body>
-                @inertia
+                <x-inertia::app />
             </body>
         </html>
         ```
 
         For React applications, it's recommended to include the `@viteReactRefresh` directive before the `@vite` directive to enable Fast Refresh in development.
 
-        The `@inertia` directive renders a `<div>` element with an `id` of `app`. This element serves as the mounting point for your JavaScript application. You may customize the `id` by passing a different value to the directive.
+        The `<x-inertia::app>` component renders a `<div>` element with an `id` of `app`. This element serves as the mounting point for your JavaScript application. You may customize the `id` by passing a different value to the component.
 
         ```blade
-        <html>
-            ...
-            <body>
-                @inertia('custom-app-id')
-            </body>
-        </html>
+        <x-inertia::app id="custom-app-id" />
         ```
 
         If you change the `id` of the root element, be sure to update it [client-side](/v3/installation/client-side-setup#defining-a-root-element) as well.
+
+        The `<x-inertia::head>` component also accepts fallback content via its slot. This content only renders when [SSR](/v3/advanced/server-side-rendering) is not active, preventing duplicate tags.
+
+        ```blade resources/views/app.blade.php
+        <x-inertia::head>
+            <title>{{ config('app.name') }}</title>
+        </x-inertia::head>
+        ```
+
+        <Accordion title="Using Blade directives">
+            Inertia also provides `@inertiaHead` and `@inertia` Blade directives as an alternative to the Blade components. These directives do not support SSR head fallback content.
+
+            ```blade resources/views/app.blade.php
+            <html>
+                <head>
+                    @vite('resources/js/app.js')
+                    @inertiaHead
+                </head>
+                <body>
+                    @inertia
+                </body>
+            </html>
+            ```
+
+            You may customize the root element `id` by passing a value to the directive: `@inertia('custom-app-id')`.
+        </Accordion>
 
         By default, Inertia's Laravel adapter will assume your root template is named `app.blade.php`. You may change this using the `Inertia::setRootView()` method.
     </Step>

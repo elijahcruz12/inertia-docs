@@ -44,6 +44,7 @@ This release also includes several additional improvements:
 - [Built-in HTTP interceptors](/v3/installation/client-side-setup#interceptors) without Axios
 - [Default layout](/v3/the-basics/layouts#default-layouts) option in `createInertiaApp`
 - [`preserveErrors`](/v3/data-props/partial-reloads#preserving-errors) option to preserve validation errors during partial reloads
+- [Blade components](/v3/installation/server-side-setup#setup-root-template) as an alternative to the `@inertia` and `@inertiaHead` directives, with SSR head fallback support
 
 ## Upgrade Dependencies
 
@@ -283,6 +284,26 @@ The deprecated `Inertia\Testing\Concerns\Has`, `Inertia\Testing\Concerns\Matchin
 ## Other Changes
 
 ---
+
+### Blade Components
+
+Inertia now provides `<x-inertia::head>` and `<x-inertia::app>` Blade components as an alternative to the `@inertiaHead` and `@inertia` directives. The head component accepts fallback content via its slot that only renders when SSR is not active, solving the long-standing issue of duplicate `<title>` tags in SSR applications.
+
+```blade resources/views/app.blade.php
+<html>
+    <head>
+        @vite('resources/js/app.js')
+        <x-inertia::head>
+            <title>{{ config('app.name') }}</title>
+        </x-inertia::head>
+    </head>
+    <body>
+        <x-inertia::app />
+    </body>
+</html>
+```
+
+The existing directives continue to work and require no changes.
 
 ### SSR in Development
 
