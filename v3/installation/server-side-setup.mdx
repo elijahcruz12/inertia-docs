@@ -61,31 +61,7 @@ These starter kits are the absolute fastest way to start building a new Inertia 
 
         If you change the `id` of the root element, be sure to update it [client-side](/v3/installation/client-side-setup#defining-a-root-element) as well.
 
-        The `<x-inertia::head>` component also accepts fallback content via its slot. This content only renders when [SSR](/v3/advanced/server-side-rendering) is not active, preventing duplicate tags.
-
-        ```blade resources/views/app.blade.php
-        <x-inertia::head>
-            <title>{{ config('app.name') }}</title>
-        </x-inertia::head>
-        ```
-
-        <Accordion title="Using Blade directives">
-            Inertia also provides `@inertiaHead` and `@inertia` Blade directives as an alternative to the Blade components. These directives do not support SSR head fallback content.
-
-            ```blade resources/views/app.blade.php
-            <html>
-                <head>
-                    @vite('resources/js/app.js')
-                    @inertiaHead
-                </head>
-                <body>
-                    @inertia
-                </body>
-            </html>
-            ```
-
-            You may customize the root element `id` by passing a value to the directive: `@inertia('custom-app-id')`.
-        </Accordion>
+        The `<x-inertia::head>` component also accepts [fallback content](/v3/the-basics/title-and-meta#ssr-fallback) via its slot for managing head elements when [SSR](/v3/advanced/server-side-rendering) is not active.
 
         By default, Inertia's Laravel adapter will assume your root template is named `app.blade.php`. You may change this using the `Inertia::setRootView()` method.
     </Step>
@@ -136,3 +112,21 @@ These starter kits are the absolute fastest way to start building a new Inertia 
     </Step>
 
 </Steps>
+
+## Blade Directives
+
+Prior to v3, Inertia used `@inertiaHead` and `@inertia` Blade directives to render head and body content. These directives are still supported but do not offer SSR head [fallback content](/v3/the-basics/title-and-meta#ssr-fallback). The Blade components above are recommended for new applications.
+
+```blade resources/views/app.blade.php
+<html>
+    <head>
+        @vite('resources/js/app.js')
+        @inertiaHead
+    </head>
+    <body>
+        @inertia
+    </body>
+</html>
+```
+
+You may customize the root element `id` by passing a value to the directive: `@inertia('custom-app-id')`.
